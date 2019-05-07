@@ -1,0 +1,9 @@
+{
+	"gamemodes": [
+		"project-open"
+	],
+	"rcon_password": "%$KoGb435.|/",
+	"port": 7777,
+	"hostname": "Project Open",
+	"maxplayers": 32
+}
