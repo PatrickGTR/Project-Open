@@ -16,7 +16,11 @@ DeleteAccount(playerid, const accountName[])
         }
         return 1;
     }
-    mysql_tquery_inline(GetSQLHandle(), sprintf("SELECT "F_USERNAME", "F_ACCOUNTID" FROM "T_ACCOUNT" WHERE "F_USERNAME" = '%e' LIMIT 1", accountName), using inline OnDeleteAccount);
+    MySQL_TQueryInline(
+        GetSQLHandle(), 
+        using inline OnDeleteAccount,
+        "SELECT "F_USERNAME", "F_ACCOUNTID" FROM "T_ACCOUNT" WHERE "F_USERNAME" = '%e' LIMIT 1", accountName
+    );
     return 1;
 }
 

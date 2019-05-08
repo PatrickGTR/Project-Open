@@ -48,8 +48,6 @@ hook OnPlayerLogin(playerid) {
 }
 
 GivePlayerVIP(playerid, level, interval_type, duration) {
-	new 
-		query[256];
     new 
         interval[6]
     ;

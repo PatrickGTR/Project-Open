@@ -9,22 +9,43 @@
 		"pBlueG/SA-MP-MySQL",
 		"oscar-broman/strlib",
 		"Southclaws/formatex",
-		"maddinat0r/sscanf"
+		"maddinat0r/sscanf",
+		"Southclaws/progress2",
+		"Zeex/samp-plugin-crashdetect",
+		"samp-incognito/samp-streamer-plugin"
 	],
+	"local": true,
 	"builds": [
 		{
 			"name": "",
 			"args": [
+				"-;+",
+				"-(+",
 				"-d3"
 			],
 			"includes": [
 				"gamemodes/core",
 				"gamemodes/core/account-auth",
 				"gamemodes/core/server",
+				"gamemodes/core/server/maps",
+				"gamemodes/core/server/enter-exit",
 				"gamemodes/core/vip",
+				"gamemodes/core/items",
+				"gamemodes/core/skills",
 				"gamemodes/core/chat",
-
-				"gamemodes/utils"
+				"gamemodes/core/features",
+				"gamemodes/core/admin",
+				"gamemodes/core/commands",
+				"gamemodes/core/commands/civilian",
+				"gamemodes/core/commands/leo",
+				"gamemodes/core/commands/global",
+				"gamemodes/core/players",
+				"gamemodes/core/players/teams",
+				"gamemodes/core/players/jobs",
+				"gamemodes/core/players/jobs/drug-dealer",
+				"gamemodes/core/players/jobs/hitman",
+				"gamemodes/utils",
+				"gamemodes/core/ui"
 			]
 		}
 	],

@@ -9,7 +9,7 @@ new
 #define sql_password    ""
 #define sql_database    "cnr"
 
-hook OnGameModeInit() {
+hook OnScriptInit() {
 	new MySQLOpt: sql_option_id = mysql_init_options();
 
 	mysql_set_option(sql_option_id, AUTO_RECONNECT, true);

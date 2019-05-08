@@ -92,9 +92,7 @@ hook OnPlayerConnect(playerid) {
             cache_get_value_name_int(0, F_ACCOUNTID, playerAccountID[playerid]);
             cache_get_value_name(0, F_HASH, playerSalt[playerid], MAX_HASH);
             cache_get_value_name(0, F_PASSWORD, playerPassword[playerid], MAX_PASSWORD);
-
-
-
+            
             PromptLogin(playerid);
 
         } else {
@@ -138,10 +136,10 @@ LoadAccount(playerid, const password[]) {
         SetPlayerScore(playerid, playerScore);
 
         cache_get_value_name_int(0, F_EXP, playerExperience);
-        //SetPlayerXP(playerid, playerExperience, true);
+        SetPlayerXP(playerid, playerExperience, true);
        
         cache_get_value_name_int(0, F_JOB, playerJob);
-        //SetPlayerJob(playerid, playerJob);
+        SetPlayerJob(playerid, playerJob);
 
         cache_get_value_name_int(0, F_KILLS, playerKills[playerid]);
         cache_get_value_name_int(0, F_DEATHS, playerDeaths[playerid]);
@@ -184,6 +182,22 @@ GetPlayerDeaths(playerid) {
     return playerDeaths[playerid];
 }
 
-GetplayerRegisterDate(playerid, date[], length) {
+GetPlayerRegisterDate(playerid, date[], length) {
     return strcpy(date, playerRegisterDate[playerid], length);
 }
+
+stock hk_SetPlayerScore(playerid, score)
+{
+    mysql_tquery(GetSQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_SCORE" = %i WHERE "F_ACCOUNTID" = %i", score, GetPlayerAccountID(playerid)));
+    return SetPlayerScore(playerid, score);
+}
+#if defined _ALS_SetPlayerScore
+    #undef SetPlayerScore
+#else
+    #define _ALS_SetPlayerScore
+#endif
+
+#define SetPlayerScore hk_SetPlayerScore
+
+GivePlayerScore(playerid, score)
+    return SetPlayerScore(playerid, GetPlayerScore(playerid) + score);
