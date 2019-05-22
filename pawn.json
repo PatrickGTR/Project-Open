@@ -26,6 +26,8 @@
 			"includes": [
 				"gamemodes/core",
 				"gamemodes/core/account-auth",
+				"gamemodes/core/houses",
+				"gamemodes/core/houses/furnitures",
 				"gamemodes/core/server",
 				"gamemodes/core/server/maps",
 				"gamemodes/core/server/enter-exit",
@@ -44,6 +46,8 @@
 				"gamemodes/core/players/jobs",
 				"gamemodes/core/players/jobs/drug-dealer",
 				"gamemodes/core/players/jobs/hitman",
+				"gamemodes/core/players/jobs/weapon-dealer",
+				"gamemodes/core/players/jobs/terrorist",
 				"gamemodes/utils",
 				"gamemodes/core/ui"
 			]

@@ -138,8 +138,13 @@ GivePlayerJobWeapons(playerid) {
 // Hitman
 #include <hitman>
 #include <track-cmd>
+#include <hitlist-cmd>
+
+// Weapon Dealer
+#include <sell-cmd>
+
+// Terrorist
+#include <plantc4-cmd>
 
 #include <jobs-mechanic>
 #include <jobs-rapist>
-#include <jobs-terrorist>
-#include <jobs-weapdealer>

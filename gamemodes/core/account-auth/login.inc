@@ -40,3 +40,24 @@ PromptLogin(playerid) {
     Dialog_ShowCallback(playerid, using inline prompt_log_Response, DIALOG_STYLE_PASSWORD, "Please login...", string, "Login", "Leave");
     return 1;
 }
+
+GetPlayerNameFromAccountID(accountid, plyName[MAX_PLAYER_NAME])
+{
+
+    new
+        qString[64];
+
+    mysql_format(GetSQLHandle(), qString, sizeof(qString), "SELECT "F_USERNAME" FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i", accountid);
+    new Cache: res = mysql_query(GetSQLHandle(), qString, true);
+
+    new
+        ret_name[24];
+    if(cache_num_rows())
+        cache_get_value_index(0, 0, ret_name);
+    else
+        ret_name = "N/A";
+
+    strcpy(plyName, ret_name, MAX_PLAYER_NAME);
+
+    cache_delete(res);
+}

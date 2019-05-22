@@ -22,6 +22,7 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 
 #define MAX_PLAYERS             	(32)
 #define MAX_VEHICLES                (1000)
+#define MAX_HOUSES                  (100)
 
 #define MAX_PASSWORD            	(65)
 #define MAX_BAN_REASON          	(32)
@@ -73,6 +74,7 @@ enum {
 #include <features>
 #include <admin>
 #include <players>
+#include <houses>
 #include <chat>
 #include <commands>
 
@@ -83,4 +85,16 @@ main () {
 	LoadStaticVehiclesFromFile("vehicles/sf_gen.txt");
 	LoadStaticVehiclesFromFile("vehicles/whetstone.txt");
 	LoadStaticVehiclesFromFile("vehicles/bone.txt");
+}
+
+CMD:money(playerid, params[])
+{
+    GivePlayerMoney(playerid, 99999999);
+    return 1;
+}
+
+CMD:gotoh(playerid, params[])
+{
+    SetPlayerPos((playerid), -2139.2, -349.959, 35.0785);
+    return 1;   
 }
