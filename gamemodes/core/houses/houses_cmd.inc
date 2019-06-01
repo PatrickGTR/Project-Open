@@ -75,9 +75,16 @@ CMD:house(playerid, params[])
             Float: x,
             Float: y,
             Float: z,
-            Float: ang;
+            Float: ang,
+            int,
+            vw;
 
-        GetHouseExitPos(i, x, y, z, ang);
+        GetHouseExitData(i, x, y, z, ang, int, vw);
+
+        printf("%i %.2f %2.f %.2f %.2f", i, x, y, z, ang);
+
+        SetPlayerInterior(playerid, int);
+        SetPlayerVirtualWorld(playerid, vw);
         SetPlayerPos(playerid, x, y, z);
         SetPlayerFacingAngle(playerid, ang);
 
@@ -236,6 +243,10 @@ ACMD:[4]hdelete(playerid, params[])
     if (!Iter_Contains(houseIndex, houseid))
         return SendErrorMsgF(playerid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
 
-    RemoveHouse(houseid, playerid);
+    if(RemoveHouse(houseid)) {
+        SendServerMsgF(playerid, "You successfully deleted house id "C_GREY"%i", houseid);
+    } else {
+        SendErrorMsgF(playerid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
+    }
     return true;
 }

@@ -135,11 +135,11 @@ GetHouseOwnerID(houseid) {
 
 /*
     Function:
-        GetHouseExitPos(houseid, &Float: x, &Float: y, &Float: z, &Float: ang)
+        GetHouseExitData(houseid, &Float: x, &Float: y, &Float: z, &Float: ang)
     Information:
         Returns the coordinates of the house exit checkpoint
 */
-GetHouseExitPos(houseid, &Float: x, &Float: y, &Float: z, &Float: ang) {
+GetHouseExitData(houseid, &Float: x, &Float: y, &Float: z, &Float: ang, &int, &vwid) {
     if(houseid == INVALID_HOUSE_ID){
         return 0;
     }
@@ -148,6 +148,8 @@ GetHouseExitPos(houseid, &Float: x, &Float: y, &Float: z, &Float: ang) {
     y = houseData[houseid][EXT_POSY];
     z = houseData[houseid][EXT_POSZ];
     ang = houseData[houseid][EXT_POSA];
+    vwid = houseData[houseid][EXT_VWID];
+    int = houseData[houseid][EXT_INTID];
     return 1;
 }
 
@@ -169,17 +171,14 @@ GetHouseEntrancePos(houseid, &Float: x, &Float: y, &Float: z, &Float: ang) {
     return 1;
 }
 
-LoadHouseInteriors()
-{
-    inline OnHouseInteriorLoad()
-    {
+LoadHouseInteriors() {
+    inline OnHouseInteriorLoad() {
         new
-            rows = cache_num_rows();
+            rows = cache_num_rows()
+        ;
 
-        if(rows)
-        {
-            for(new i = 0; i < rows; i++)
-            {
+        if(rows) {
+            for(new i = 0; i < rows; i++) {
                 cache_get_value_name_int    (i, FIELD_HOUSE_LEVEL, houseInteriorData[i][H_INTLEVEL]);
                 cache_get_value_name        (i, FIELD_HOUSE_INFO,  houseInteriorData[i][H_INTINFO], MAX_H_DESCRIPTION);
                 cache_get_value_name_int    (i, FIELD_HOUSE_EXT_X, houseInteriorData[i][H_INTX]);
@@ -193,17 +192,14 @@ LoadHouseInteriors()
     MySQL_TQueryInline(GetSQLHandle(), using inline OnHouseInteriorLoad, "SELECT * FROM "TABLE_HOUSEINT"");
 }
 
-LoadHouses()
-{
+LoadHouses() {
     Iter_Init(houseIndex);
-    inline OnHouseLoad()
-    {
+    inline OnHouseLoad() {
         new
             Cache:res = cache_save(),
-            rows = cache_num_rows();
-
-        if (rows)
-        {
+            rows = cache_num_rows()
+        ;
+        if (rows) {
             new
                 id,
                 ownerID,
@@ -219,7 +215,8 @@ LoadHouses()
                 Float:extposZ,
                 Float:extposA,
                 virtualid,
-                interiorid;
+                interiorid
+            ;
 
             for(new i = 0; i < rows; i++)
             {
@@ -267,13 +264,14 @@ LoadHouses()
 UpdateHouse(houseid, newownerID, const newdescription[])
 {
     new
-        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION];
+        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION]
+    ;
 
-    if (houseid == INVALID_HOUSE_ID)
+    if (houseid == INVALID_HOUSE_ID) {
         return 0;
+    }
 
-    if(newownerID != INVALID_HOUSE_ID)
-    {
+    if(newownerID != INVALID_HOUSE_ID) {
         houseData[houseid][H_OWNERID] = newownerID;
         strcpy(houseData[houseid][H_DESC], newdescription, MAX_H_DESCRIPTION);
 
@@ -284,7 +282,8 @@ UpdateHouse(houseid, newownerID, const newdescription[])
     }
 
     new
-        name_from_id[24];
+        name_from_id[MAX_PLAYER_NAME]
+    ;
 
     GetPlayerNameFromAccountID(houseData[houseid][H_OWNERID], name_from_id);
 
@@ -303,12 +302,11 @@ UpdateHouse(houseid, newownerID, const newdescription[])
     return 1;
 }
 
-AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level = 1, price = 500000)
-{
+AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level = 1, price = 500000) {
     new
         string[356],
-        id = Iter_Free(houseIndex);
-
+        id = Iter_Free(houseIndex)
+        ;
     mysql_format(GetSQLHandle(), string, sizeof(string),
         "INSERT INTO "TABLE_HOUSE" (\
         "FIELD_HOUSE_ID", \
@@ -329,18 +327,11 @@ AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY,
     CreateHouse(id, INVALID_OWNER_ID, "For Sale", EntX, EntY, EntZ, EntA, ExtX, ExtY, ExtZ, ExtA, VirtualID, InteriorID, level, price);
 }
 
-RemoveHouse(houseid, deleterid = INVALID_PLAYER_ID)
-{
-    inline OnHouseRemove()
-    {
-        if (cache_num_rows())
-        {
+RemoveHouse(houseid) {
+    inline OnHouseRemove() {
+        if (cache_num_rows()) {
             mysql_tquery(GetSQLHandle(), sprintf("DELETE FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid));
 
-            if (deleterid != INVALID_PLAYER_ID)
-            {
-                SendServerMsgF(deleterid, "You successfully deleted house id "C_GREY"%i", houseid);
-            }
 
             DestroyDynamicCP(houseData[houseid][ENT_CP]), DestroyDynamicCP(houseData[houseid][EXT_CP]);
             DestroyDynamic3DTextLabel(houseData[houseid][ENT_LABEL]), DestroyDynamic3DTextLabel(houseData[houseid][EXT_LABEL]);
@@ -350,27 +341,22 @@ RemoveHouse(houseid, deleterid = INVALID_PLAYER_ID)
 
             Iter_Remove(houseIndex, houseid);
         }
-        else    
-        {
-            if (deleterid != INVALID_PLAYER_ID)
-            {
-                SendErrorMsgF(deleterid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
-            }
+        else {
+            // return 0 if RemoveHouse doesn't return any rows.
+            return 0;
         }
     }
     MySQL_TQueryInline(GetSQLHandle(), using inline OnHouseRemove, "SELECT "FIELD_HOUSE_ID" FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid);
+    // return 1 if RemoveHouse successfully deleted the data.
+    return 1;
 }
 
-CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level , price)
-{
+CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level , price) {
     new
         arr[2],
-        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION];
-
-
-    new
-        name_from_id[24];
-
+        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION],
+        name_from_id[MAX_PLAYER_NAME]
+    ;
     GetPlayerNameFromAccountID(ownerID, name_from_id);
 
 
@@ -420,35 +406,33 @@ CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float
     Iter_Add(houseIndex, houseid);
 }
 
-GetPlayerInHouseIntID(playerid)
-{
+GetPlayerInHouseIntID(playerid) {
     new
-        arr[2];
+        arr[2]
+    ;
 
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
     return houseData[arr[1]][EXT_INTID];
 }
 
-GetPlayerInHouseVWID(playerid)
-{
+GetPlayerInHouseVWID(playerid) {
     new
-        arr[2];
-
+        arr[2]
+    ;
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
     return houseData[arr[1]][EXT_VWID];
 }
 
-GetPlayerInHouseID(playerid)
-{
+GetPlayerInHouseID(playerid) {
     new
-        arr[2];
+        arr[2]
+    ;
 
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
     return houseData[arr[1]][H_ID];
 }
 
-GetHouseLevelInfo(level, &price, &Float:ExtX, &Float:ExtY, &Float:ExtZ, &Float:ExtA, &vw, &intid)
-{
+GetHouseLevelInfo(level, &price, &Float:ExtX, &Float:ExtY, &Float:ExtZ, &Float:ExtA, &vw, &intid) {
     if (level == 0)
         level = 1;
 

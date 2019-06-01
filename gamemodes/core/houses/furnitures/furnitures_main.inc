@@ -17,7 +17,7 @@
 #define FIELD_FURNITURE_INTID	"interior_id"
 #define FIELD_FURNITURE_VWID	"virtual_world"
 
-enum INTERIOR_EDITING_TYPE:
+enum INTERIOR_EDITING_TYPE
 {
 	INVALID_EDITING_TYPE = -1,
 	TYPE_EDITING_FURNITURE,
@@ -34,8 +34,7 @@ new
 
 #include <YSI_Coding\y_hooks>
 
-hook OnGameModeInit()
-{
+hook OnGameModeInit() {
     mysql_tquery(GetSQLHandle(),
         "CREATE TABLE IF NOT EXISTS "TABLE_FURNITURE" \
         ("FIELD_FURNITURE_INDEXID" INT(11) AUTO_INCREMENT, \
@@ -52,13 +51,9 @@ hook OnGameModeInit()
         PRIMARY KEY("FIELD_FURNITURE_INDEXID", "FIELD_FURNITURE_HOUSEID"), \
         FOREIGN KEY("FIELD_FURNITURE_HOUSEID") REFERENCES "TABLE_HOUSE"("FIELD_HOUSE_ID") ON DELETE CASCADE ON UPDATE CASCADE)");
 
-    inline LoadFurnitureObjects()
-    {
-        new
-            rows = cache_num_rows();
-
-        if(rows)
-        {
+    inline LoadFurnitureObjects() {
+        new rows = cache_num_rows() ;
+        if(rows) {
             new
                 furniture_id,
                 house_id,
@@ -73,8 +68,7 @@ hook OnGameModeInit()
                 virtual_id
             ;
 
-            for(new i = 0; i != rows; i++)
-            {
+            for(new i = 0; i != rows; i++) {
                 cache_get_value_name_int(i, FIELD_FURNITURE_INDEXID, furniture_id);
                 cache_get_value_name_int(i, FIELD_FURNITURE_HOUSEID, house_id);
                 cache_get_value_name_int(i, FIELD_FURNITURE_OBJID,   object_id);
@@ -95,11 +89,11 @@ hook OnGameModeInit()
         }
     }
     MySQL_TQueryInline(GetSQLHandle(), using inline LoadFurnitureObjects, "SELECT * FROM "TABLE_FURNITURE"");
+    return 1;
 }
 
 
-hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
-{
+hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz) {
     if(IsPlayerOnFurnitureMode(playerid))
     {
         switch(GetPlayerFurnitureEditingType(playerid))
@@ -241,24 +235,20 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
             }
         }
     }
-    return Y_HOOKS_CONTINUE_RETURN_1;
+    return 1;
 }
 
 hook OnPlayerSelectDynObj(playerid, objectid, modelid, Float:x, Float:y, Float:z)
 {
-    if(IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_EDITING_FURNITURE)
-    {
+    if(IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_EDITING_FURNITURE) {
         EditDynamicObject(playerid, objectid);
     }
-    else if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_DELETING_FURNITURE)
-    {
+    else if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_DELETING_FURNITURE) {
 
-        inline ConfirmFurnitureDeletion(pid, dialogid, response, listitem, string:inputtext[])
-        {
+        inline ConfirmFurnitureDeletion(pid, dialogid, response, listitem, string:inputtext[]) {
             #pragma unused pid, listitem, dialogid, inputtext
             if(!response)
                 return ShowPlayerFurnitureDialog(playerid);
-
 
             SetPlayerFurnitureEditingType(playerid, INVALID_EDITING_TYPE);
             SetPlayerFurnitureMode(playerid, false);
@@ -282,5 +272,5 @@ hook OnPlayerSelectDynObj(playerid, objectid, modelid, Float:x, Float:y, Float:z
             "Confirm", 
             "Back");
     }
-    return Y_HOOKS_CONTINUE_RETURN_1;
+    return 1;
 }

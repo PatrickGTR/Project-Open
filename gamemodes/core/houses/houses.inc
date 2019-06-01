@@ -13,9 +13,9 @@ Iterator: houseIndex<MAX_HOUSES>,
           ply_houseCheckpointID[MAX_PLAYERS];
 
 
-#include <houses-impl>
+#include "houses-impl"
 #include <furnitures_main>
-#include <houses_cmd>
+#include "houses_cmd"
 
 #include <YSI_Coding\y_hooks>
 
