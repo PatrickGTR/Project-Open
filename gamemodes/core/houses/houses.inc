@@ -3,7 +3,6 @@
 #define MAX_H_DESCRIPTION       (32)
 #define MAX_HOUSE_PER_PLAYER    (1)
 
-#define INVALID_HOUSE_ID        (-1)
 #define INVALID_OWNER_ID        (-1)
 #define HOUSES_STREAMER_IDENTIFIER (20)
 
@@ -84,18 +83,15 @@ hook OnGameModeInit()
 
 
 
-hook OnPlayerEnterDynamicCP(playerid, checkpointid)
-{
+hook OnPlayerEnterDynamicCP(playerid, checkpointid) {
     new
         arr[2];
 
     Streamer_GetArrayData(STREAMER_TYPE_CP, checkpointid, E_STREAMER_EXTRA_ID, arr);
 
-    if (arr[0] == HOUSES_STREAMER_IDENTIFIER)
-    {
+    if (arr[0] == HOUSES_STREAMER_IDENTIFIER) {
         new i = arr[1];
-        if (checkpointid == GetHouseEntranceCP(i))
-        {
+        if (checkpointid == GetHouseEntranceCP(i)) {
             ply_InHouseID[playerid] = i;
             ply_houseCheckpointID[playerid] = checkpointid;
         }
@@ -103,3 +99,11 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
     return 1;
 }
 
+hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys) {
+
+    if(PRESSED(KEY_SECONDARY_ATTACK)) {
+        cmd_house(playerid, "enter");
+        cmd_house(playerid, "exit");
+    }
+    return 1;
+}

@@ -1,7 +1,7 @@
 #include <YSI_Coding\y_hooks>
 #include <YSI_Data\y_bit>
 
-static 
+static
     BitArray: ply_insidehouse<MAX_PLAYERS>;
 
 hook OnPlayerDeath(playerid)
@@ -10,7 +10,7 @@ hook OnPlayerDeath(playerid)
     return 1;
 }
 
-CMD:house(playerid, params[])
+CMD:house(playerid, const params[])
 {
     new
         i = ply_InHouseID[playerid],
@@ -71,7 +71,7 @@ CMD:house(playerid, params[])
 
         GameTextForPlayer(playerid, "~g~Welcome Home", 2000, 1);
 
-        new     
+        new
             Float: x,
             Float: y,
             Float: z,
@@ -80,8 +80,6 @@ CMD:house(playerid, params[])
             vw;
 
         GetHouseExitData(i, x, y, z, ang, int, vw);
-
-        printf("%i %.2f %2.f %.2f %.2f", i, x, y, z, ang);
 
         SetPlayerInterior(playerid, int);
         SetPlayerVirtualWorld(playerid, vw);
@@ -103,7 +101,7 @@ CMD:house(playerid, params[])
         SetPlayerInterior(playerid, 0);
         SetPlayerVirtualWorld(playerid, 0);
 
-        new     
+        new
             Float: x,
             Float: y,
             Float: z,
@@ -146,7 +144,7 @@ CMD:house(playerid, params[])
 
         ++ houseData[i][H_LEVEL];
         UpdateHouse(i, GetPlayerAccountID(playerid), houseData[i][H_DESC]);
-    } 
+    }
     */
     if (isequal(params, "furniture"))
     {
@@ -163,13 +161,14 @@ CMD:house(playerid, params[])
             switch(listitem)
             {
                 // Main Menu
-                case 0: ShowPlayerFurnitureDialog(playerid);
+                case 0: {
+                    ShowPlayerFurnitureDialog(playerid);
+                }
                 // Edit Menu
-                case 1:
-                {
-                    if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_EDITING_FURNITURE)
+                case 1: {
+                    if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_EDITING_FURNITURE) {
                         return SendErrorMsg(playerid, "You are already editing a furniture, close the current one in order to proceed again.");
-
+                    }
                     SetPlayerFurnitureEditingType(playerid, TYPE_EDITING_FURNITURE);
                     SetPlayerFurnitureMode(playerid, true);
 
@@ -178,8 +177,7 @@ CMD:house(playerid, params[])
                     SendServerMsgF(playerid, "Press ESC once you're done, to allow your character to move.");
                 }
                 // Delete Menu
-                case 2:
-                {
+                case 2: {
                     SetPlayerFurnitureEditingType(playerid, TYPE_DELETING_FURNITURE);
                     SetPlayerFurnitureMode(playerid, true);
 
@@ -191,62 +189,6 @@ CMD:house(playerid, params[])
 
         }
         Dialog_ShowCallback(playerid, using inline ShowFurnitureOption, DIALOG_STYLE_LIST, "Furniture", "Buy Furniture\nEdit Furniture\nDelete Furniture", "Select", "Close");
-    }
-    return true;
-}
-
-// ADMIN COMMAND //
-ACMD:[4]hcreate(playerid, params[])
-{
-    if (Iter_Count(houseIndex) == INVALID_HOUSE_ID)
-        return SendErrorMsg(playerid, "MAX_HOUSES reached its limit.");
-
-    if (isnull(params) || !IsNumeric(params))
-        return SendSyntaxMsg(playerid, "/hcreate <House Level> (Available Levels: 1 - 10)");
-
-    new level = strval(params);
-
-    if((10 < level <= 0))
-        return SendErrorMsg(playerid, "Invalid house level, available levels are 1 -> 10");
-
-    new
-        Float:h_entposX,
-        Float:h_entposY,
-        Float:h_entposZ,
-        Float:h_entposA,
-        price,
-        interiorid,
-        virtualid,
-        Float:h_extposX,
-        Float:h_extposY,
-        Float:h_extposZ,
-        Float:h_extposA;
-
-    GetPlayerPos(playerid, h_entposX, h_entposY, h_entposZ);
-    GetPlayerFacingAngle(playerid, h_entposA);
-
-    GetHouseLevelInfo(level, price, h_extposX, h_extposY, h_extposZ, h_extposA, virtualid, interiorid);
-
-    AddHouse(h_entposX, h_entposY, h_entposZ, h_entposA, h_extposX, h_extposY, h_extposZ, h_extposA, virtualid, interiorid, level, price);
-    return true;
-}
-
-ACMD:[4]hdelete(playerid, params[])
-{
-
-    if (isnull(params) || !IsNumeric(params))
-        return SendSyntaxMsg(playerid, "/hdelete <HouseID>");
-
-    new
-        houseid = strval(params);
-
-    if (!Iter_Contains(houseIndex, houseid))
-        return SendErrorMsgF(playerid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
-
-    if(RemoveHouse(houseid)) {
-        SendServerMsgF(playerid, "You successfully deleted house id "C_GREY"%i", houseid);
-    } else {
-        SendErrorMsgF(playerid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
     }
     return true;
 }

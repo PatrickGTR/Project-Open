@@ -2,9 +2,9 @@
 
 ACMD:[4]setvip(playerid, params[])
 {
-    new 
-        targetid, 
-        level, 
+    new
+        targetid,
+        level,
         month;
 
     if (isnull(params))
@@ -36,7 +36,7 @@ ACMD:[4]setvip(playerid, params[])
 
         if (targetid == INVALID_PLAYER_ID)
             return SendErrorMsg(playerid, "The player you are trying to set VIP is invalid");
-        
+
         if (GetPlayerVIPLevel(targetid) > 0)
             return SendErrorMsg(playerid, "The player you are trying to set VIP has VIP already.");
 
@@ -49,4 +49,61 @@ ACMD:[4]setvip(playerid, params[])
         SendAdminMessageF("ADMIN "C_GREY"%p "C_WHITE"sets "C_GREY"%p "C_WHITE"VIP level to "C_GREY"%i", playerid, targetid, level);
     }
     return true;
-} 
+}
+
+ACMD:[4]hcreate(playerid, params[])
+{
+    if (GetTotalHouses() == INVALID_HOUSE_ID) {
+        return SendErrorMsg(playerid, "MAX_HOUSES reached its limit.");
+    }
+
+    if (isnull(params) || !IsNumeric(params)) {
+        return SendSyntaxMsg(playerid, "/hcreate <House Level> (Available Levels: 1 - 10)");
+    }
+
+    new level = strval(params);
+
+    if((10 < level <= 0)) {
+        return SendErrorMsg(playerid, "Invalid house level, available levels are 1 -> 10");
+    }
+
+    new
+        Float:h_entposX,
+        Float:h_entposY,
+        Float:h_entposZ,
+        Float:h_entposA,
+        price,
+        interiorid,
+        virtualid,
+        Float:h_extposX,
+        Float:h_extposY,
+        Float:h_extposZ,
+        Float:h_extposA;
+
+    GetPlayerPos(playerid, h_entposX, h_entposY, h_entposZ);
+    GetPlayerFacingAngle(playerid, h_entposA);
+
+    GetHouseLevelInfo(level, price, h_extposX, h_extposY, h_extposZ, h_extposA, virtualid, interiorid);
+
+    AddHouse(h_entposX, h_entposY, h_entposZ, h_entposA, h_extposX, h_extposY, h_extposZ, h_extposA, virtualid, interiorid, level, price);
+    return true;
+}
+
+
+
+ACMD:[4]hdelete(playerid, params[])
+{
+
+    if (isnull(params) || !IsNumeric(params)) {
+        return SendSyntaxMsg(playerid, "/hdelete <HouseID>");
+    }
+
+    new houseid = strval(params);
+
+    if(RemoveHouse(houseid)) {
+        SendServerMsgF(playerid, "You successfully deleted house id "C_GREY"%i", houseid);
+    } else {
+        SendErrorMsgF(playerid, "The house "C_GREY"(ID:%i) "C_WHITE"you are trying to delete was not found in the database.", houseid);
+    }
+    return true;
+}

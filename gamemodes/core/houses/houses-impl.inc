@@ -251,9 +251,9 @@ LoadHouses() {
             cache_delete(res);
         }
     }
-    MySQL_TQueryInline(
-        GetSQLHandle(), 
-        using inline OnHouseLoad, 
+    MySQL_PQueryInline(
+        GetSQLHandle(),
+        using inline OnHouseLoad,
         "SELECT *, IFNULL(h1."FIELD_HOUSE_OWNERID", -1) \
             AS ownerid FROM "TABLE_HOUSE" AS h1 LEFT JOIN "TABLE_HOUSEINT" AS h2 \
         ON \
@@ -306,7 +306,7 @@ AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY,
     new
         string[356],
         id = Iter_Free(houseIndex)
-        ;
+    ;
     mysql_format(GetSQLHandle(), string, sizeof(string),
         "INSERT INTO "TABLE_HOUSE" (\
         "FIELD_HOUSE_ID", \
@@ -327,33 +327,41 @@ AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY,
     CreateHouse(id, INVALID_OWNER_ID, "For Sale", EntX, EntY, EntZ, EntA, ExtX, ExtY, ExtZ, ExtA, VirtualID, InteriorID, level, price);
 }
 
+GetTotalHouses() {
+    return Iter_Count(houseIndex);
+}
+
 RemoveHouse(houseid) {
+
+    if(!Iter_Contains(houseIndex, houseid))
+        // return 0 if the houseid is not in the iterator.
+        return 0;
+
     inline OnHouseRemove() {
         if (cache_num_rows()) {
+
+            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][ENT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
+            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][EXT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
+
+            DestroyDynamicCP(houseData[houseid][ENT_CP]);
+            DestroyDynamicCP(houseData[houseid][EXT_CP]);
+            DestroyDynamic3DTextLabel(houseData[houseid][ENT_LABEL]);
+            DestroyDynamic3DTextLabel(houseData[houseid][EXT_LABEL]);
+
+            // delete from the database.
             mysql_tquery(GetSQLHandle(), sprintf("DELETE FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid));
-
-
-            DestroyDynamicCP(houseData[houseid][ENT_CP]), DestroyDynamicCP(houseData[houseid][EXT_CP]);
-            DestroyDynamic3DTextLabel(houseData[houseid][ENT_LABEL]), DestroyDynamic3DTextLabel(houseData[houseid][EXT_LABEL]);
-
-            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][ENT_CP], E_STREAMER_EXTRA_ID, houseid);
-            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][EXT_CP], E_STREAMER_EXTRA_ID, houseid);
-
+            // remove from the iterator.
             Iter_Remove(houseIndex, houseid);
-        }
-        else {
-            // return 0 if RemoveHouse doesn't return any rows.
+        } else {
             return 0;
         }
     }
     MySQL_TQueryInline(GetSQLHandle(), using inline OnHouseRemove, "SELECT "FIELD_HOUSE_ID" FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid);
-    // return 1 if RemoveHouse successfully deleted the data.
     return 1;
 }
 
 CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level , price) {
     new
-        arr[2],
         string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION],
         name_from_id[MAX_PLAYER_NAME]
     ;
@@ -377,7 +385,7 @@ CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float
     houseData[houseid][ENT_CP] = CreateDynamicCP(EntX, EntY, EntZ, 1.0, -1, -1, -1, 25.0);
     houseData[houseid][EXT_CP] = CreateDynamicCP(ExtX, ExtY, ExtZ, 1.0, VirtualID, InteriorID, -1, 25.0);
 
-
+    new arr[2];
     arr[0] = HOUSES_STREAMER_IDENTIFIER;
     arr[1] = houseid;
 

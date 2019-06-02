@@ -25,7 +25,7 @@ enum INTERIOR_EDITING_TYPE
     TYPE_DELETING_FURNITURE
 }
 
-new 
+new
     tempPlayerObjectID[MAX_PLAYERS] = {INVALID_OBJECT_ID, ...},
     tempPlayerIndexID[MAX_PLAYERS] = {-1, ...};
 
@@ -269,7 +269,7 @@ hook OnPlayerSelectDynObj(playerid, objectid, modelid, Float:x, Float:y, Float:z
         Dialog_ShowCallback(playerid, using inline ConfirmFurnitureDeletion, DIALOG_STYLE_MSGBOX,
             "Furniture Delete Confirmation",
             ""C_WHITE"Are you sure you want to delete this furniture?\nIt will be "C_RED"PERMANENTLY"C_WHITE" deleted.",
-            "Confirm", 
+            "Confirm",
             "Back");
     }
     return 1;

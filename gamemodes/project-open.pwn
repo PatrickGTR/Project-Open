@@ -7,14 +7,14 @@
         Y_Less     - YSI, sscanf.
         maddinat0r - MySQL, helped me with an issue in house system.
         Slice      - strlib, formatex.
-*/ 
+*/
 
 #include <a_samp>
 
 native gpci(playerid, buffer[], size = sizeof(buffer));
 
 // Definitions
-#undef MAX_PLAYERS 
+#undef MAX_PLAYERS
 #undef MAX_VEHICLES
 
 #define SV_NAME 			"Project Open"
@@ -23,6 +23,8 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 #define MAX_PLAYERS             	(32)
 #define MAX_VEHICLES                (1000)
 #define MAX_HOUSES                  (100)
+
+#define INVALID_HOUSE_ID        (-1)
 
 #define MAX_PASSWORD            	(65)
 #define MAX_BAN_REASON          	(32)
@@ -79,7 +81,7 @@ enum {
 #include <commands>
 
 main () {
-    // Server Vehicles 
+    // Server Vehicles
 	LoadStaticVehiclesFromFile("vehicles/sf_law.txt");
 	LoadStaticVehiclesFromFile("vehicles/sf_airport.txt");
 	LoadStaticVehiclesFromFile("vehicles/sf_gen.txt");
@@ -91,10 +93,4 @@ CMD:money(playerid, params[])
 {
     GivePlayerMoney(playerid, 99999999);
     return 1;
-}
-
-CMD:gotoh(playerid, params[])
-{
-    SetPlayerPos((playerid), -2139.2, -349.959, 35.0785);
-    return 1;   
 }
