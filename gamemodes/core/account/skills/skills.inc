@@ -1,14 +1,14 @@
 #include <YSI_Coding\y_hooks>
 #include <strlib>
 
-#define T_SKILL_TYPE 		"skills_type"
-#define F_SKILL_ID 			"skill_id"
-#define F_SKILL_NAME 		"skill_name"
+#define TABLE_SKILL_TYPE 		"skills_type"
+#define FIELD_SKILL_ID 			"skill_id"
+#define FIELD_SKILL_NAME 		"skill_name"
 
-#define T_PLAYER_SKILLS     "skills_player"
-#define F_FK_USER_ID 	    "fk_user_id"
-#define F_FK_SKILLID        "fk_skill_id"
-#define F_SKILL_VALUE       "value"
+#define TABLE_PLAYER_SKILLS     "skills_player"
+#define FIELD_FK_ACCOUNT_ID     "fk_account_id"
+#define FIELD_FK_SKILLID        "fk_skill_id"
+#define FIELD_SKILL_VALUE       "value"
 
 enum _: E_MYSQL_SKILL_ID {
 	TOTAL_RAPE_SKILL_ID = 0,
@@ -38,7 +38,7 @@ static playerSkills[MAX_PLAYERS][E_PLAYER_SKILL_DATA];
 hook OnGameModeInit() {
 	mysql_tquery(
         GetMySQLHandle(),
-        "CREATE TABLE IF NOT EXISTS "T_SKILL_TYPE"("F_SKILL_ID" SMALLINT(6) NOT NULL, "F_SKILL_NAME" VARCHAR(24) NOT NULL, PRIMARY KEY("F_SKILL_ID"))"
+        "CREATE TABLE IF NOT EXISTS "TABLE_SKILL_TYPE"("FIELD_SKILL_ID" SMALLINT(6) NOT NULL, "FIELD_SKILL_NAME" VARCHAR(24) NOT NULL, PRIMARY KEY("FIELD_SKILL_ID"))"
     );
 
 	inline checkSkillsRow() {
@@ -48,7 +48,7 @@ hook OnGameModeInit() {
 		if(!rows) {
 			mysql_tquery(
                 GetMySQLHandle(),
-                "INSERT INTO "T_SKILL_TYPE" ("F_SKILL_ID", "F_SKILL_NAME") VALUES \
+                "INSERT INTO "TABLE_SKILL_TYPE" ("FIELD_SKILL_ID", "FIELD_SKILL_NAME") VALUES \
                 (0, 'TotalRape'), \
                 (1, 'TotalBeenRaped'), \
                 (2, 'TotalRob'), \
@@ -63,18 +63,18 @@ hook OnGameModeInit() {
 	MySQL_TQueryInline(
         GetMySQLHandle(),
         using inline checkSkillsRow,
-        "SELECT COUNT("F_SKILL_ID") FROM "T_SKILL_TYPE""
+        "SELECT COUNT("FIELD_SKILL_ID") FROM "TABLE_SKILL_TYPE""
     );
 
 	mysql_tquery(
         GetMySQLHandle(),
-        "CREATE TABLE IF NOT EXISTS "T_PLAYER_SKILLS"(\
-		"F_FK_USER_ID" INT(11) NOT NULL, \
-		"F_FK_SKILLID" SMALLINT(6) NOT NULL, \
-		"F_SKILL_VALUE" INT(11) NOT NULL, \
-		PRIMARY KEY("F_FK_USER_ID", "F_FK_SKILLID"), \
-		FOREIGN KEY("F_FK_USER_ID") REFERENCES "T_ACCOUNT"("F_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE, \
-        FOREIGN KEY("F_FK_SKILLID") REFERENCES "T_SKILL_TYPE"("F_SKILL_ID") ON DELETE CASCADE ON UPDATE CASCADE)"
+        "CREATE TABLE IF NOT EXISTS "TABLE_PLAYER_SKILLS"(\
+		"FIELD_FK_ACCOUNT_ID" INT(11) NOT NULL, \
+		"FIELD_FK_SKILLID" SMALLINT(6) NOT NULL, \
+		"FIELD_SKILL_VALUE" INT(11) NOT NULL, \
+		PRIMARY KEY("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID"), \
+		FOREIGN KEY("FIELD_FK_ACCOUNT_ID") REFERENCES "TABLE_ACCOUNT"("FIELD_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE, \
+        FOREIGN KEY("FIELD_FK_SKILLID") REFERENCES "TABLE_SKILL_TYPE"("FIELD_SKILL_ID") ON DELETE CASCADE ON UPDATE CASCADE)"
     );
     return 1;
 }
@@ -96,8 +96,8 @@ hook OnPlayerLogin(playerid) {
 
 		if(rows) {
 			for(new i = 0; i < rows; i++) {
-				cache_get_value_name_int(i, F_SKILL_ID, skill_id);
-				cache_get_value_name_int(i, F_SKILL_VALUE, skill_val);
+				cache_get_value_name_int(i, FIELD_SKILL_ID, skill_id);
+				cache_get_value_name_int(i, FIELD_SKILL_VALUE, skill_val);
 
 				switch(skill_id) {
 					case TOTAL_RAPE_SKILL_ID: {
@@ -132,10 +132,10 @@ hook OnPlayerLogin(playerid) {
 	MySQL_TQueryInline(
         GetMySQLHandle(),
         using inline OnPlayerSkillsLoad,
-        "SELECT p."F_FK_SKILLID", p."F_SKILL_VALUE", s."F_SKILL_ID" \
-        FROM "T_PLAYER_SKILLS" as p INNER JOIN "T_SKILL_TYPE" as s \
-        ON p."F_FK_SKILLID" = s."F_SKILL_ID" \
-        WHERE p."F_FK_USER_ID" = %i", GetPlayerAccountID(playerid)
+        "SELECT p."FIELD_FK_SKILLID", p."FIELD_SKILL_VALUE", s."FIELD_SKILL_ID" \
+        FROM "TABLE_PLAYER_SKILLS" as p INNER JOIN "TABLE_SKILL_TYPE" as s \
+        ON p."FIELD_FK_SKILLID" = s."FIELD_SKILL_ID" \
+        WHERE p."FIELD_FK_ACCOUNT_ID" = %i", GetPlayerAccountID(playerid)
     );
     return 1;
 }
@@ -151,8 +151,8 @@ hook OnPlayerLogin(playerid) {
 
 SetPlayerTotalRape(playerid, value, skill_id = TOTAL_RAPE_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_RAPE] = value;
 }
 
@@ -172,8 +172,8 @@ GetPlayerTotalRape(playerid)
 
 SetPlayerTotalBeenRape(playerid, value, skill_id = TOTAL_BRAPE_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_BEENRAPED] = value;
 }
 
@@ -193,8 +193,8 @@ GetPlayerTotalBeenRape(playerid)
 
 SetPlayerTotalRob(playerid, value, skill_id = TOTAL_ROB_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_ROB] = value;
 }
 
@@ -213,8 +213,8 @@ GetPlayerTotalRob(playerid)
 
 SetPlayerTotalBeenRob(playerid, value, skill_id = TOTAL_BROB_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_BEENROBBED] = value;
 }
 
@@ -234,8 +234,8 @@ GetPlayerTotalBeenRob(playerid)
 
 SetPlayerTotalStoreRob(playerid, value, skill_id = TOTAL_STOREROB_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_STOREROBBED] = value;
 }
 
@@ -255,8 +255,8 @@ GetPlayerTotalStoreRob(playerid)
 
 SetPlayerTotalCuffEscape(playerid, value, skill_id = TOTAL_CUFFESCAPE_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_CUFFESCAPE] = value;
 }
 
@@ -277,8 +277,8 @@ GetPlayerTotalCuffEscape(playerid)
 
 SetPlayerTotalArrest(playerid, value, skill_id = TOTAL_ARREST_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_ARREST] = value;
 }
 
@@ -299,8 +299,8 @@ GetPlayerTotalArrest(playerid)
 
 SetPlayerTotalBeenArrest(playerid, value, skill_id = TOTAL_BARREST_SKILL_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_PLAYER_SKILLS" ("F_FK_USER_ID", "F_FK_SKILLID", "F_SKILL_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_PLAYER_SKILLS" ("FIELD_FK_ACCOUNT_ID", "FIELD_FK_SKILLID", "FIELD_SKILL_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_SKILL_VALUE" = %i", GetPlayerAccountID(playerid), skill_id, value, value));
     return playerSkills[playerid][TTL_BEENARRESTED] = value;
 }
 

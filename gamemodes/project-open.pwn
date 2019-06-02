@@ -69,10 +69,7 @@ enum {
 #include <utils>
 #include <server>
 #include <ui>
-#include <account-auth>
-#include <items>
-#include <skills>
-#include <vip>
+#include <account>
 #include <features>
 #include <admin>
 #include <players>

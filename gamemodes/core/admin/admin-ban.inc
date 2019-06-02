@@ -1,12 +1,12 @@
 #include <YSI_Coding\y_hooks>
 
-#define T_BAN       "bans"
-#define F_IP        "ipadress"
-#define F_GPCI      "gpci"
-#define F_REASON    "reason"
-#define F_ADMIN     "by_admin"
-#define F_DATE      "timestamp_date"
-#define F_UDATE     "timestamp_udate"
+#define TABLE_BAN       "bans"
+#define FIELD_IP        "ipadress"
+#define FIELD_GPCI      "gpci"
+#define FIELD_REASON    "reason"
+#define FIELD_ADMIN     "by_admin"
+#define FIELD_DATE      "timestamp_date"
+#define FIELD_UDATE     "timestamp_udate"
 
 forward OnRemovePlayerBan(username[MAX_PLAYER_NAME], unbannerid);
 
@@ -14,14 +14,14 @@ hook OnGameModeInit()
 {
 
     mysql_tquery(GetMySQLHandle(),
-    	"CREATE TABLE IF NOT EXISTS "T_BAN" (\
-    	"F_USERNAME" VARCHAR(24), \
-    	"F_IP" VARCHAR(17), \
-    	"F_GPCI" VARCHAR(60), \
-    	"F_REASON" VARCHAR(32), \
-        "F_ADMIN" VARCHAR(24), \
-        "F_DATE" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, \
-        "F_UDATE" datetime NOT NULL DEFAULT '0000-00-00 00:00:00')"
+    	"CREATE TABLE IF NOT EXISTS "TABLE_BAN" (\
+    	"FIELD_USERNAME" VARCHAR(24), \
+    	"FIELD_IP" VARCHAR(17), \
+    	"FIELD_GPCI" VARCHAR(60), \
+    	"FIELD_REASON" VARCHAR(32), \
+        "FIELD_ADMIN" VARCHAR(24), \
+        "FIELD_DATE" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, \
+        "FIELD_UDATE" datetime NOT NULL DEFAULT '0000-00-00 00:00:00')"
    );
 }
 
@@ -59,7 +59,7 @@ AddPlayerBan(playerid, byid = INVALID_PLAYER_ID, reason[], interval_type, bandur
     }
 
     mysql_format(GetMySQLHandle(), query, sizeof(query), "\
-        INSERT INTO "T_BAN" ("F_USERNAME","F_IP", "F_GPCI", "F_REASON", "F_ADMIN", "F_DATE", "F_UDATE" ) VALUES \
+        INSERT INTO "TABLE_BAN" ("FIELD_USERNAME","FIELD_IP", "FIELD_GPCI", "FIELD_REASON", "FIELD_ADMIN", "FIELD_DATE", "FIELD_UDATE" ) VALUES \
         ('%e', '%e', '%e', '%e', '%e',  CURRENT_TIMESTAMP(), DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL %i %s))", plyName, plyIP, plyGPCI, reason, name, banduration, interval);
     mysql_tquery(GetMySQLHandle(), query, "", "");
     return Kick(playerid);
@@ -69,7 +69,7 @@ RemovePlayerBan(username[], playerid = INVALID_PLAYER_ID) {
     new
         query[45 + MAX_PLAYER_NAME];
 
-    mysql_format(GetMySQLHandle(), query, sizeof(query), "SELECT "F_USERNAME" FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
+    mysql_format(GetMySQLHandle(), query, sizeof(query), "SELECT "FIELD_USERNAME" FROM "TABLE_BAN" WHERE "FIELD_USERNAME" = '%e'", username);
     mysql_tquery(GetMySQLHandle(), query, "OnRemovePlayerBan", "si", username, playerid);
 }
 
@@ -83,7 +83,7 @@ public OnRemovePlayerBan(username[MAX_PLAYER_NAME], unbannerid) {
         }
     }
     else {
-        mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
+        mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "TABLE_BAN" WHERE "FIELD_USERNAME" = '%e'", username);
         mysql_tquery(GetMySQLHandle(), query, "", "");
         if (unbannerid != INVALID_PLAYER_ID) {
             SendServerMsgF(unbannerid, "You successfully unbanned "C_GREY"%s's "C_WHITE"account.", username);
@@ -113,10 +113,10 @@ IsPlayerBanned(playerid) {
         ;
 
         if (cache_num_rows()) {
-            cache_get_value_name(0, F_USERNAME, name, sizeof(name));
-            cache_get_value_name(0, F_IP,       banip, sizeof(banip));
-            cache_get_value_name(0, F_ADMIN,    banby, sizeof(banby));
-            cache_get_value_name(0, F_REASON,   banreason, sizeof(banreason));
+            cache_get_value_name(0, FIELD_USERNAME, name, sizeof(name));
+            cache_get_value_name(0, FIELD_IP,       banip, sizeof(banip));
+            cache_get_value_name(0, FIELD_ADMIN,    banby, sizeof(banby));
+            cache_get_value_name(0, FIELD_REASON,   banreason, sizeof(banreason));
 
             cache_get_value_name(0, "date_ban",     bandate, sizeof(bandate));
             cache_get_value_name(0, "date_unban",   unbandate, sizeof(unbandate));
@@ -146,10 +146,10 @@ IsPlayerBanned(playerid) {
     MySQL_PQueryInline(
         GetMySQLHandle(),
         using inline OnPlayerBanLoad,
-        "SELECT *, DATE_FORMAT("F_DATE",'"SQL_DATETIME_FORMAT"') AS date_ban, \
-        DATE_FORMAT("F_UDATE",'"SQL_DATETIME_FORMAT"') AS date_unban, \
-        TIMESTAMPDIFF(SECOND, CURRENT_TIMESTAMP(), "F_UDATE") AS expired \
-        FROM "T_BAN" WHERE "F_USERNAME" = '%e' OR "F_GPCI" = '%e' OR "F_IP" = '%e' LIMIT 1", plyName, retrieveGCPI, plyIP
+        "SELECT *, DATE_FORMAT("FIELD_DATE",'"SQL_DATETIME_FORMAT"') AS date_ban, \
+        DATE_FORMAT("FIELD_UDATE",'"SQL_DATETIME_FORMAT"') AS date_unban, \
+        TIMESTAMPDIFF(SECOND, CURRENT_TIMESTAMP(), "FIELD_UDATE") AS expired \
+        FROM "TABLE_BAN" WHERE "FIELD_USERNAME" = '%e' OR "FIELD_GPCI" = '%e' OR "FIELD_IP" = '%e' LIMIT 1", plyName, retrieveGCPI, plyIP
     );
     return 0;
 }

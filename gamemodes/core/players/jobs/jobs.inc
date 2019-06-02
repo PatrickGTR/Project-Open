@@ -7,7 +7,7 @@ static
 
 SetPlayerJob(playerid, job_id, bool:save_job = false) {
     if(save_job == true) {
-        mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_JOB" = %i WHERE "F_ACCOUNTID" = %i", job_id, GetPlayerAccountID(playerid)));
+        mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_JOB" = %i WHERE "FIELD_ACCOUNTID" = %i", job_id, GetPlayerAccountID(playerid)));
     }
 
     playerJob[playerid] = job_id;

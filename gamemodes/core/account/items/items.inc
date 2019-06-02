@@ -4,14 +4,14 @@
 
 #include <strlib>
 
-#define T_ITEM_TYPE            	"item_type"
-#define F_ITEMID               	"item_id"
-#define F_ITEMNAME             	"item_name"
+#define TABLE_ITEM_TYPE            	"item_type"
+#define FIELD_ITEMID               	"item_id"
+#define FIELD_ITEMNAME             	"item_name"
 
-#define T_ITEMPLAYERS          	"item_players"
-#define F_FK_USERID            	"fk_user_id"
-#define F_FK_ITEMID            	"fk_item_id"
-#define F_VALUE              	"value"
+#define TABLE_ITEMPLAYERS          	"item_players"
+#define FIELD_FK_USERID            	"fk_account_id"
+#define FIELD_FK_ITEMID            	"fk_item_id"
+#define FIELD_VALUE              	"value"
 
 enum _: E_MYSQL_ITEM_ID
 {
@@ -42,10 +42,10 @@ static
 
 hook OnGameModeInit()
 {
-	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "T_ITEM_TYPE" (\
-		"F_ITEMID" SMALLINT(6) NOT NULL, \
-		"F_ITEMNAME" VARCHAR(12) NOT NULL, \
-		PRIMARY KEY("F_ITEMID"))");
+	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "TABLE_ITEM_TYPE" (\
+		"FIELD_ITEMID" SMALLINT(6) NOT NULL, \
+		"FIELD_ITEMNAME" VARCHAR(12) NOT NULL, \
+		PRIMARY KEY("FIELD_ITEMID"))");
 
 	inline checkItemRows()
 	{
@@ -54,7 +54,7 @@ hook OnGameModeInit()
 
 		if(!rows)
 		{
-			mysql_tquery(GetMySQLHandle(), "INSERT INTO "T_ITEM_TYPE" ("F_ITEMID", "F_ITEMNAME") \
+			mysql_tquery(GetMySQLHandle(), "INSERT INTO "TABLE_ITEM_TYPE" ("FIELD_ITEMID", "FIELD_ITEMNAME") \
 			VALUES \
 			(0, 'weed'), \
 			(1, 'crack'), \
@@ -66,15 +66,15 @@ hook OnGameModeInit()
 			(7, 'c4')");
 		}
     }
-	MySQL_TQueryInline(GetMySQLHandle(), using inline checkItemRows, "SELECT COUNT("F_ITEMID") FROM "T_ITEM_TYPE"");
+	MySQL_TQueryInline(GetMySQLHandle(), using inline checkItemRows, "SELECT COUNT("FIELD_ITEMID") FROM "TABLE_ITEM_TYPE"");
 
-	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "T_ITEMPLAYERS"(\
-		"F_FK_USERID" INT(11) NOT NULL, \
-		"F_FK_ITEMID" SMALLINT(6) NOT NULL, \
-		"F_VALUE" SMALLINT(6) NOT NULL, \
-        PRIMARY KEY ("F_FK_USERID", "F_FK_ITEMID"), \
-        FOREIGN KEY ("F_FK_USERID") REFERENCES "T_ACCOUNT"("F_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE, \
-        FOREIGN KEY ("F_FK_ITEMID") REFERENCES "T_ITEM_TYPE"("F_ITEMID") ON DELETE CASCADE ON UPDATE CASCADE)");
+	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "TABLE_ITEMPLAYERS"(\
+		"FIELD_FK_USERID" INT(11) NOT NULL, \
+		"FIELD_FK_ITEMID" SMALLINT(6) NOT NULL, \
+		"FIELD_VALUE" SMALLINT(6) NOT NULL, \
+        PRIMARY KEY ("FIELD_FK_USERID", "FIELD_FK_ITEMID"), \
+        FOREIGN KEY ("FIELD_FK_USERID") REFERENCES "TABLE_ACCOUNT"("FIELD_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE, \
+        FOREIGN KEY ("FIELD_FK_ITEMID") REFERENCES "TABLE_ITEM_TYPE"("FIELD_ITEMID") ON DELETE CASCADE ON UPDATE CASCADE)");
 }
 
 
@@ -93,8 +93,8 @@ hook OnPlayerLogin(playerid)
 
 			for(new i = 0; i < rows; i++)
 			{
-				cache_get_value_name_int(i, F_FK_ITEMID, item_id);
-				cache_get_value_name_int(i, F_VALUE, item_val);
+				cache_get_value_name_int(i, FIELD_FK_ITEMID, item_id);
+				cache_get_value_name_int(i, FIELD_VALUE, item_val);
 
 				switch(item_id)
 				{
@@ -123,10 +123,10 @@ hook OnPlayerLogin(playerid)
 	MySQL_TQueryInline(
         GetMySQLHandle(),
         using inline OnPlayerItemsLoad,
-        "SELECT p."F_FK_ITEMID", p."F_VALUE", t."F_ITEMID" FROM \
-		"T_ITEMPLAYERS" as p INNER JOIN "T_ITEM_TYPE" as t \
-		on p."F_FK_ITEMID" = t."F_ITEMID" \
-		WHERE p."F_FK_USERID" = %i", GetPlayerAccountID(playerid)
+        "SELECT p."FIELD_FK_ITEMID", p."FIELD_VALUE", t."FIELD_ITEMID" FROM \
+		"TABLE_ITEMPLAYERS" as p INNER JOIN "TABLE_ITEM_TYPE" as t \
+		on p."FIELD_FK_ITEMID" = t."FIELD_ITEMID" \
+		WHERE p."FIELD_FK_USERID" = %i", GetPlayerAccountID(playerid)
     );
 }
 
@@ -140,8 +140,8 @@ hook OnPlayerLogin(playerid)
 
 SetPlayerWeed(playerid, amount, item_id = WEED_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_WEED] = amount;
 }
 
@@ -160,8 +160,8 @@ GetPlayerWeed(playerid)
 
 SetPlayerCrack(playerid, amount, item_id = CRACK_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_CRACK] = amount;
 }
 
@@ -181,8 +181,8 @@ GetPlayerCrack(playerid)
 
 SetPlayerRope(playerid, amount, item_id = ROPE_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_ROPE] = amount;
 }
 
@@ -201,8 +201,8 @@ GetPlayerRope(playerid)
 
 SetPlayerCondom(playerid, amount, item_id = CONDOM_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_CONDOM] = amount;
 }
 
@@ -220,8 +220,8 @@ GetPlayerCondom(playerid)
 */
 SetPlayerWallet(playerid, amount, item_id = WALLET_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_WALLET] = amount;
 }
 
@@ -240,8 +240,8 @@ GetPlayerWallet(playerid)
 */
 SetPlayerPickLock(playerid, amount, item_id = PICKLOCK_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_PICKLOCK] = amount;
 }
 
@@ -260,8 +260,8 @@ GetPlayerPickLock(playerid)
 */
 SetPlayerScissors(playerid, amount, item_id = SCISSORS_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_SCISSORS] = amount;
 }
 
@@ -280,8 +280,8 @@ GetPlayerScissors(playerid)
 */
 SetPlayerC4(playerid, amount, item_id = C4_ITEM_ID)
 {
-    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "T_ITEMPLAYERS" ("F_FK_USERID", "F_FK_ITEMID", "F_VALUE") \
-       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "F_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
+    mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
+       VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
     return playerItems[playerid][P_C4] = amount;
 }
 

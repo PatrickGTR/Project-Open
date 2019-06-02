@@ -26,7 +26,7 @@ SetPlayerXP(playerid, amount, bool:first_spawn = false)
 		defer HidePlayerXPTD(playerid);
 	}
 
-	mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_EXP" = %i WHERE "F_ACCOUNTID" = %i", amount, GetPlayerAccountID(playerid)));
+	mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_EXP" = %i WHERE "FIELD_ACCOUNTID" = %i", amount, GetPlayerAccountID(playerid)));
 	return 1;
 }
 
