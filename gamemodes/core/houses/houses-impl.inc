@@ -189,7 +189,7 @@ LoadHouseInteriors() {
             }
         }
     }
-    MySQL_TQueryInline(GetSQLHandle(), using inline OnHouseInteriorLoad, "SELECT * FROM "TABLE_HOUSEINT"");
+    MySQL_TQueryInline(GetMySQLHandle(), using inline OnHouseInteriorLoad, "SELECT * FROM "TABLE_HOUSEINT"");
 }
 
 LoadHouses() {
@@ -251,8 +251,8 @@ LoadHouses() {
             cache_delete(res);
         }
     }
-    MySQL_PQueryInline(
-        GetSQLHandle(),
+    MySQL_TQueryInline(
+        GetMySQLHandle(),
         using inline OnHouseLoad,
         "SELECT *, IFNULL(h1."FIELD_HOUSE_OWNERID", -1) \
             AS ownerid FROM "TABLE_HOUSE" AS h1 LEFT JOIN "TABLE_HOUSEINT" AS h2 \
@@ -275,10 +275,10 @@ UpdateHouse(houseid, newownerID, const newdescription[])
         houseData[houseid][H_OWNERID] = newownerID;
         strcpy(houseData[houseid][H_DESC], newdescription, MAX_H_DESCRIPTION);
 
-        mysql_format(GetSQLHandle(), string, sizeof(string),
+        mysql_format(GetMySQLHandle(), string, sizeof(string),
         "UPDATE "TABLE_HOUSE" SET "FIELD_HOUSE_OWNERID" = %i, "FIELD_HOUSE_DESCRIPTION" = '%e', "FIELD_HOUSE_INTERIOR" = %i WHERE "FIELD_HOUSE_ID" = %i",
         newownerID, newdescription, houseData[houseid][H_LEVEL], houseid);
-        mysql_tquery(GetSQLHandle(), string);
+        mysql_tquery(GetMySQLHandle(), string);
     }
 
     new
@@ -307,7 +307,7 @@ AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY,
         string[356],
         id = Iter_Free(houseIndex)
     ;
-    mysql_format(GetSQLHandle(), string, sizeof(string),
+    mysql_format(GetMySQLHandle(), string, sizeof(string),
         "INSERT INTO "TABLE_HOUSE" (\
         "FIELD_HOUSE_ID", \
         "FIELD_HOUSE_OWNERID", \
@@ -322,7 +322,7 @@ AddHouse(Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY,
         "FIELD_HOUSE_VWID") \
         VALUES (%i, NULL, 'For Sale', %i, %i, 0, %0.4f, %0.4f, %0.4f, %0.4f, %i)",
         id, price, level, EntX, EntY, EntZ, EntA, VirtualID);
-    mysql_tquery(GetSQLHandle(), string);
+    mysql_tquery(GetMySQLHandle(), string);
 
     CreateHouse(id, INVALID_OWNER_ID, "For Sale", EntX, EntY, EntZ, EntA, ExtX, ExtY, ExtZ, ExtA, VirtualID, InteriorID, level, price);
 }
@@ -349,14 +349,14 @@ RemoveHouse(houseid) {
             DestroyDynamic3DTextLabel(houseData[houseid][EXT_LABEL]);
 
             // delete from the database.
-            mysql_tquery(GetSQLHandle(), sprintf("DELETE FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid));
+            mysql_tquery(GetMySQLHandle(), sprintf("DELETE FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid));
             // remove from the iterator.
             Iter_Remove(houseIndex, houseid);
         } else {
             return 0;
         }
     }
-    MySQL_TQueryInline(GetSQLHandle(), using inline OnHouseRemove, "SELECT "FIELD_HOUSE_ID" FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid);
+    MySQL_TQueryInline(GetMySQLHandle(), using inline OnHouseRemove, "SELECT "FIELD_HOUSE_ID" FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid);
     return 1;
 }
 
@@ -385,7 +385,8 @@ CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float
     houseData[houseid][ENT_CP] = CreateDynamicCP(EntX, EntY, EntZ, 1.0, -1, -1, -1, 25.0);
     houseData[houseid][EXT_CP] = CreateDynamicCP(ExtX, ExtY, ExtZ, 1.0, VirtualID, InteriorID, -1, 25.0);
 
-    new arr[2];
+    new
+        arr[2];
     arr[0] = HOUSES_STREAMER_IDENTIFIER;
     arr[1] = houseid;
 

@@ -1,5 +1,5 @@
 PromptRegister(playerid) {
-    
+
     static string[512];
     inline prompt_reg_Response(ply_id, dialogid, response, listitem, string:inputtext[]) {
         #pragma unused ply_id, dialogid, listitem
@@ -13,7 +13,13 @@ PromptRegister(playerid) {
         "C_WHITE"Welcome to "SV_NAME". This account "C_RED"%p "C_WHITE"is not registered, type your password below to register.\n\n\
         "C_RED"NOTE: "C_WHITE"Once you are registered we suggest that you "C_RED"DO NOT "C_WHITE"share your password with anyone even the server owner.\n\n\
         Once you are spawned please read "C_YELLOW"/rules, /pc and /commands "C_WHITE"to make sure you understand the server concepts.\n\nEnjoy! - "SV_NAME" Staff Team :)", playerid);
-    Dialog_ShowCallback(playerid, using inline prompt_reg_Response, DIALOG_STYLE_PASSWORD, "Please register...", string, "Register", "Leave");
+    Dialog_ShowCallback(playerid,
+        using inline prompt_reg_Response,
+        DIALOG_STYLE_PASSWORD, // style
+        "Please register...", // title
+        string, // content
+        "Register", // button left
+        "Leave"); // button right
     return 1;
 }
 
@@ -50,8 +56,8 @@ CreateAccount(playerid, const password[])
         salt[MAX_HASH],
         _playerPassword[MAX_PASSWORD];
 
-    for(new i; i < 10; i++) { 
-        salt[i] = random(79) + 47; 
+    for(new i; i < 10; i++) {
+        salt[i] = random(79) + 47;
     }
     salt[10] = 0;
 
@@ -64,11 +70,11 @@ CreateAccount(playerid, const password[])
         SendServerMsg(playerid, "You have just registered to our server! You have been automatically logged in!");
     }
 
-    new 
+    new
         playerName[MAX_PLAYER_NAME];
     GetPlayerName(playerid, playerName, sizeof(playerName));
 
-    
-    MySQL_PQueryInline(GetSQLHandle(), using inline OnPlayerRegister, "INSERT INTO accounts ("F_USERNAME", "F_PASSWORD", "F_HASH", "F_REG_DATE") VALUES ('%e', '%e', '%e', CURRENT_TIMESTAMP())", playerName, _playerPassword, salt);
+
+    MySQL_PQueryInline(GetMySQLHandle(), using inline OnPlayerRegister, "INSERT INTO accounts ("F_USERNAME", "F_PASSWORD", "F_HASH", "F_REG_DATE") VALUES ('%e', '%e', '%e', CURRENT_TIMESTAMP())", playerName, _playerPassword, salt);
     return 1;
 }

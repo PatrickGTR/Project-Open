@@ -2,12 +2,12 @@
 #include <formatex>
 #include <strlib>
 
-static 
+static
     playerJob[MAX_PLAYERS];
 
 SetPlayerJob(playerid, job_id, bool:save_job = false) {
     if(save_job == true) {
-        mysql_tquery(GetSQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_JOB" = %i WHERE "F_ACCOUNTID" = %i", job_id, GetPlayerAccountID(playerid)));
+        mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_JOB" = %i WHERE "F_ACCOUNTID" = %i", job_id, GetPlayerAccountID(playerid)));
     }
 
     playerJob[playerid] = job_id;
@@ -21,7 +21,7 @@ GetPlayerJob(playerid) {
 ShowPlayerJobMenu(playerid) {
     if (GetPlayerJob(playerid) != TYPE_NO_JOB)
         return 0;
-    
+
     inline jobmenu_response(ply_id, dialogid, response, listitem, string:inputtext[]) {
         #pragma unused ply_id, dialogid, inputtext
         if (!response) {
@@ -67,9 +67,9 @@ ShowPlayerJobMenu(playerid) {
 }
 
 GetPlayerJobName(playerid) {
-    new 
+    new
         jobName[24];
-   
+
     switch(GetPlayerJob(playerid)) {
         case TYPE_DRUGDEALER: {
             strcpy(jobName, "Drug Dealer");
@@ -86,7 +86,7 @@ GetPlayerJobName(playerid) {
         case TYPE_RAPIST: {
             strcpy(jobName, "Rapist");
         }
-        case TYPE_MECHANIC: { 
+        case TYPE_MECHANIC: {
             strcpy(jobName, "Mechanic");
         }
     }

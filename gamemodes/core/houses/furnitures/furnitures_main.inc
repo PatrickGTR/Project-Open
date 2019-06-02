@@ -35,7 +35,7 @@ new
 #include <YSI_Coding\y_hooks>
 
 hook OnGameModeInit() {
-    mysql_tquery(GetSQLHandle(),
+    mysql_tquery(GetMySQLHandle(),
         "CREATE TABLE IF NOT EXISTS "TABLE_FURNITURE" \
         ("FIELD_FURNITURE_INDEXID" INT(11) AUTO_INCREMENT, \
         "FIELD_FURNITURE_HOUSEID" SMALLINT(6) NOT NULL, \
@@ -88,7 +88,7 @@ hook OnGameModeInit() {
             }
         }
     }
-    MySQL_TQueryInline(GetSQLHandle(), using inline LoadFurnitureObjects, "SELECT * FROM "TABLE_FURNITURE"");
+    MySQL_TQueryInline(GetMySQLHandle(), using inline LoadFurnitureObjects, "SELECT * FROM "TABLE_FURNITURE"");
     return 1;
 }
 
@@ -120,13 +120,13 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
                             return 1;
                         }
 
-                        mysql_format(GetSQLHandle(), qString, sizeof(qString), "INSERT INTO "TABLE_FURNITURE" \
+                        mysql_format(GetMySQLHandle(), qString, sizeof(qString), "INSERT INTO "TABLE_FURNITURE" \
                                 ("FIELD_FURNITURE_HOUSEID", "FIELD_FURNITURE_OBJID", "FIELD_FURNITURE_POSX", "FIELD_FURNITURE_POSY", "FIELD_FURNITURE_POSZ", \
                                 "FIELD_FURNITURE_ROTX", "FIELD_FURNITURE_ROTY", "FIELD_FURNITURE_ROTZ", "FIELD_FURNITURE_INTID", "FIELD_FURNITURE_VWID") \
                             VALUES \
                             (%i, %i, %0.4f, %0.4f, %0.4f, %0.4f, %0.4f, %0.4f, %i, %i)", GetPlayerInHouseID(playerid), furnitureData[index][E_FURNITURE_OBJID], x, y, z, rx, ry, rz,
                             GetPlayerInHouseIntID(playerid), GetPlayerInHouseVWID(playerid));
-                        mysql_tquery(GetSQLHandle(), qString);
+                        mysql_tquery(GetMySQLHandle(), qString);
 
                         inline LoadNewFurniture()
                         {
@@ -169,7 +169,7 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
                                 CreateFurniture(furniture_id, house_id, object_id, pos_x, pos_y, pos_z, rot_x, rot_y, rot_z, virtual_id, int_id);
                             }
                         }
-                        MySQL_TQueryInline(GetSQLHandle(), using inline LoadNewFurniture,  "SELECT * FROM "TABLE_FURNITURE" WHERE "FIELD_FURNITURE_INDEXID" =  LAST_INSERT_ID()");
+                        MySQL_TQueryInline(GetMySQLHandle(), using inline LoadNewFurniture,  "SELECT * FROM "TABLE_FURNITURE" WHERE "FIELD_FURNITURE_INDEXID" =  LAST_INSERT_ID()");
 
                         SendServerMsg(playerid, "Object Saved [BOUGHT]");
                         GivePlayerMoney(playerid, -furnitureData[index][E_FURNITURE_PRICE]);
@@ -221,7 +221,7 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
                         */
                         Streamer_GetArrayData(STREAMER_TYPE_OBJECT, objectid, E_STREAMER_EXTRA_ID, arr);
 
-                        mysql_tquery(GetSQLHandle(), sprintf(
+                        mysql_tquery(GetMySQLHandle(), sprintf(
                         "UPDATE "TABLE_FURNITURE" SET \
                         "FIELD_FURNITURE_POSX" = %0.4f, \
                         "FIELD_FURNITURE_POSY" = %0.4f, \

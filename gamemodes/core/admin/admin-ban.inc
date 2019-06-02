@@ -13,7 +13,7 @@ forward OnRemovePlayerBan(username[MAX_PLAYER_NAME], unbannerid);
 hook OnGameModeInit()
 {
 
-    mysql_tquery(GetSQLHandle(),
+    mysql_tquery(GetMySQLHandle(),
     	"CREATE TABLE IF NOT EXISTS "T_BAN" (\
     	"F_USERNAME" VARCHAR(24), \
     	"F_IP" VARCHAR(17), \
@@ -58,10 +58,10 @@ AddPlayerBan(playerid, byid = INVALID_PLAYER_ID, reason[], interval_type, bandur
         case 2: strcpy(interval, "YEAR", sizeof(interval));
     }
 
-    mysql_format(GetSQLHandle(), query, sizeof(query), "\
+    mysql_format(GetMySQLHandle(), query, sizeof(query), "\
         INSERT INTO "T_BAN" ("F_USERNAME","F_IP", "F_GPCI", "F_REASON", "F_ADMIN", "F_DATE", "F_UDATE" ) VALUES \
         ('%e', '%e', '%e', '%e', '%e',  CURRENT_TIMESTAMP(), DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL %i %s))", plyName, plyIP, plyGPCI, reason, name, banduration, interval);
-    mysql_tquery(GetSQLHandle(), query, "", "");
+    mysql_tquery(GetMySQLHandle(), query, "", "");
     return Kick(playerid);
 }
 
@@ -69,8 +69,8 @@ RemovePlayerBan(username[], playerid = INVALID_PLAYER_ID) {
     new
         query[45 + MAX_PLAYER_NAME];
 
-    mysql_format(GetSQLHandle(), query, sizeof(query), "SELECT "F_USERNAME" FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
-    mysql_tquery(GetSQLHandle(), query, "OnRemovePlayerBan", "si", username, playerid);
+    mysql_format(GetMySQLHandle(), query, sizeof(query), "SELECT "F_USERNAME" FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
+    mysql_tquery(GetMySQLHandle(), query, "OnRemovePlayerBan", "si", username, playerid);
 }
 
 public OnRemovePlayerBan(username[MAX_PLAYER_NAME], unbannerid) {
@@ -83,8 +83,8 @@ public OnRemovePlayerBan(username[MAX_PLAYER_NAME], unbannerid) {
         }
     }
     else {
-        mysql_format(GetSQLHandle(), query, sizeof(query), "DELETE FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
-        mysql_tquery(GetSQLHandle(), query, "", "");
+        mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_BAN" WHERE "F_USERNAME" = '%e'", username);
+        mysql_tquery(GetMySQLHandle(), query, "", "");
         if (unbannerid != INVALID_PLAYER_ID) {
             SendServerMsgF(unbannerid, "You successfully unbanned "C_GREY"%s's "C_WHITE"account.", username);
         }
@@ -144,7 +144,7 @@ IsPlayerBanned(playerid) {
         }
     }
     MySQL_PQueryInline(
-        GetSQLHandle(), 
+        GetMySQLHandle(),
         using inline OnPlayerBanLoad,
         "SELECT *, DATE_FORMAT("F_DATE",'"SQL_DATETIME_FORMAT"') AS date_ban, \
         DATE_FORMAT("F_UDATE",'"SQL_DATETIME_FORMAT"') AS date_unban, \

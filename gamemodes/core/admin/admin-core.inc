@@ -33,7 +33,7 @@ hook OnGameModeInit() {
     	PRIMARY KEY ("F_ADM_ACCID"), \
     	FOREIGN KEY ("F_ADM_ACCID") REFERENCES "T_ACCOUNT"("F_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE)\
     ";
-    mysql_tquery(GetSQLHandle(), admin_createQuery);
+    mysql_tquery(GetMySQLHandle(), admin_createQuery);
     return 1;
 }
 
@@ -52,7 +52,7 @@ hook OnPlayerLogin(playerid)
 			SetPlayerAdminLevel(playerid, adm_level);
 		}
 	}
-	MySQL_TQueryInline(GetSQLHandle(), using inline OnPlayerAdminLoad, "SELECT "F_ADM_LEVEL" FROM "T_ADM_ACC" WHERE "F_ADM_ACCID" = %i", GetPlayerAccountID(playerid));
+	MySQL_TQueryInline(GetMySQLHandle(), using inline OnPlayerAdminLoad, "SELECT "F_ADM_LEVEL" FROM "T_ADM_ACC" WHERE "F_ADM_ACCID" = %i", GetPlayerAccountID(playerid));
 }
 
 /*
@@ -108,7 +108,7 @@ SetPlayerAdminLevel(playerid, level)
     adminLevel[playerid] = level;
 
     mysql_tquery(
-        GetSQLHandle(), 
+        GetMySQLHandle(),
         sprintf(
             "INSERT INTO "T_ADM_ACC" ("F_ADM_ACCID", "F_ADM_LEVEL") VALUES (%i, %i) \
             ON DUPLICATE KEY UPDATE "F_ADM_LEVEL" = %i", GetPlayerAccountID(playerid), level, level

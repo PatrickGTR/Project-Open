@@ -100,7 +100,7 @@ CreateFurniture(furnitureID, houseID, objectID, Float:x, Float:y, Float:z, Float
 }
 
 DeleteFurniture(houseID, furnitureID) {
-	mysql_tquery(GetSQLHandle(),
+	mysql_tquery(GetMySQLHandle(),
 		sprintf("DELETE FROM "TABLE_FURNITURE" WHERE "FIELD_FURNITURE_INDEXID" = %i AND "FIELD_FURNITURE_HOUSEID" = %i", furnitureID, houseID));
 	return furnitureID;
 }

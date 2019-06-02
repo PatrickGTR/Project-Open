@@ -10,14 +10,14 @@ DeleteAccount(playerid, const accountName[])
 
             cache_get_value_name_int(0, F_ACCOUNTID, acc_id);
 
-            mysql_tquery(GetSQLHandle(), sprintf("DELETE FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i", acc_id));
+            mysql_tquery(GetMySQLHandle(), sprintf("DELETE FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i", acc_id));
 
             SendServerMsgF(playerid, "The account "C_GREY"(Nane: '%s' - accountID: %i) has been successfully deleted!", accountName, acc_id);
         }
         return 1;
     }
     MySQL_TQueryInline(
-        GetSQLHandle(), 
+        GetMySQLHandle(),
         using inline OnDeleteAccount,
         "SELECT "F_USERNAME", "F_ACCOUNTID" FROM "T_ACCOUNT" WHERE "F_USERNAME" = '%e' LIMIT 1", accountName
     );
@@ -47,8 +47,8 @@ GetPlayerNameFromAccountID(accountid, plyName[MAX_PLAYER_NAME])
     new
         qString[64];
 
-    mysql_format(GetSQLHandle(), qString, sizeof(qString), "SELECT "F_USERNAME" FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i", accountid);
-    new Cache: res = mysql_query(GetSQLHandle(), qString, true);
+    mysql_format(GetMySQLHandle(), qString, sizeof(qString), "SELECT "F_USERNAME" FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i", accountid);
+    new Cache: res = mysql_query(GetMySQLHandle(), qString, true);
 
     new
         ret_name[24];

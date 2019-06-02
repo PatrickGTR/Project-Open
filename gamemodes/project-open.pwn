@@ -24,7 +24,7 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 #define MAX_VEHICLES                (1000)
 #define MAX_HOUSES                  (100)
 
-#define INVALID_HOUSE_ID        (-1)
+#define INVALID_HOUSE_ID            (-1)
 
 #define MAX_PASSWORD            	(65)
 #define MAX_BAN_REASON          	(32)

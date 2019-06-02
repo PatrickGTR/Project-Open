@@ -1,7 +1,7 @@
 #include <a_mysql>
 #include <YSI_Coding\y_hooks>
 
-new 
+new
     MySQL:sql_handle;
 
 #define sql_server      "127.0.0.1"
@@ -23,7 +23,7 @@ hook OnScriptInit() {
 		SendRconCommand("exit");
 		return 1;
 	}
-    
+
     print("MySQL connection is successful.");
     return 1;
 }
@@ -33,4 +33,6 @@ hook OnGameModeExit() {
     return 1;
 }
 
-MySQL:GetSQLHandle() return sql_handle;
+MySQL:GetMySQLHandle() {
+    return sql_handle;
+}

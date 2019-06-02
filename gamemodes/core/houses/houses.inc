@@ -22,7 +22,7 @@ Iterator: houseIndex<MAX_HOUSES>,
 
 hook OnGameModeInit()
 {
-    mysql_tquery(GetSQLHandle(),
+    mysql_tquery(GetMySQLHandle(),
         "CREATE TABLE IF NOT EXISTS "TABLE_HOUSEINT"(\
         "FIELD_HOUSE_LEVEL" TINYINT(4) NOT NULL,\
         "FIELD_HOUSE_INFO" VARCHAR(24) NOT NULL, \
@@ -41,7 +41,7 @@ hook OnGameModeInit()
 
         if(!rows)
         {
-            mysql_tquery(GetSQLHandle(), "INSERT INTO "TABLE_HOUSEINT" (\
+            mysql_tquery(GetMySQLHandle(), "INSERT INTO "TABLE_HOUSEINT" (\
                 "FIELD_HOUSE_LEVEL", "FIELD_HOUSE_INFO",  "FIELD_HOUSE_EXT_X", "FIELD_HOUSE_EXT_Y", "FIELD_HOUSE_EXT_Z", "FIELD_HOUSE_EXT_A", "FIELD_HOUSE_INTID") \
                 VALUES \
                 (1, 'Level 1', -42.6186, 1412.7570, 1084.4297, 179.4052, 8), \
@@ -57,11 +57,11 @@ hook OnGameModeInit()
             );
         }
     }
-    MySQL_TQueryInline(GetSQLHandle(), using inline checkHouseIntRows, "SELECT COUNT("FIELD_HOUSE_LEVEL") FROM "TABLE_HOUSEINT"");
+    MySQL_TQueryInline(GetMySQLHandle(), using inline checkHouseIntRows, "SELECT COUNT("FIELD_HOUSE_LEVEL") FROM "TABLE_HOUSEINT"");
 
     LoadHouseInteriors();
 
-    mysql_tquery(GetSQLHandle(),
+    mysql_tquery(GetMySQLHandle(),
         "CREATE TABLE IF NOT EXISTS "TABLE_HOUSE"(\
         "FIELD_HOUSE_ID" SMALLINT NOT NULL DEFAULT 0, \
         "FIELD_HOUSE_OWNERID" INT(11) NULL DEFAULT NULL, \

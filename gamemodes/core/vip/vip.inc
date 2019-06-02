@@ -11,7 +11,7 @@ static
 hook OnGameModeInit()
 {
     mysql_tquery(
-        GetSQLHandle(), 
+        GetMySQLHandle(),
         "CREATE TABLE IF NOT EXISTS "T_VIP"(\
         "F_VIP_OWNERID" INT(11) AUTO_INCREMENT, \
         "F_VIP_LEVEL" TINYINT(2) NOT NULL DEFAULT 0, \
@@ -41,20 +41,20 @@ hook OnPlayerLogin(playerid) {
     }
 
 	MySQL_TQueryInline(
-        GetSQLHandle(), using inline OnPlayerVIPLoad, 
+        GetMySQLHandle(), using inline OnPlayerVIPLoad,
         "SELECT *, DATE_FORMAT("F_VIP_EXPIRE", '"SQL_DATETIME_FORMAT"') as vip_expire_data, TIMESTAMPDIFF(SECOND, CURRENT_TIMESTAMP(), "F_VIP_EXPIRE") \
         FROM "T_VIP" WHERE "F_VIP_OWNERID" = %i LIMIT 1", GetPlayerAccountID(playerid)
     );
 }
 
 GivePlayerVIP(playerid, level, interval_type, duration) {
-    new 
+    new
         interval[6]
     ;
 	interval = interval_type == 0 ? ("MONTH") : ("YEAR");
 
     mysql_tquery(
-        GetSQLHandle(), 
+        GetMySQLHandle(),
         sprintf("INSERT INTO "T_VIP" ("F_VIP_OWNERID", "F_VIP_LEVEL", "F_VIP_EXPIRE") \
 	    VALUES(%i, %i, DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL %i %s))", GetPlayerAccountID(playerid), level, duration, interval)
     );
@@ -63,11 +63,11 @@ GivePlayerVIP(playerid, level, interval_type, duration) {
 }
 
 RemovePlayerVIP(playerid) {
-	new 
+	new
 		query[45 + MAX_PLAYER_NAME];
 
-	mysql_format(GetSQLHandle(), query, sizeof(query), "DELETE FROM "T_VIP" WHERE "F_VIP_OWNERID" = %i", GetPlayerAccountID(playerid));
-	mysql_tquery(GetSQLHandle(), query);
+	mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_VIP" WHERE "F_VIP_OWNERID" = %i", GetPlayerAccountID(playerid));
+	mysql_tquery(GetMySQLHandle(), query);
 }
 
 GetPlayerVIPLevel(playerid) {

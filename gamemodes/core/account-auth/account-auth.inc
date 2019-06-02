@@ -12,7 +12,7 @@
 #define F_ACCOUNTID     "accountID"
 #define F_USERNAME      "username"
 #define F_PASSWORD      "password"
-#define F_HASH          "hash"
+#define F_HASH          "salt"
 #define F_MONEY         "money"
 #define F_KILLS         "kills"
 #define F_DEATHS        "deaths"
@@ -43,7 +43,7 @@ forward OnPlayerLogin(playerid);
 hook OnGameModeInit()
 {
 
-    mysql_tquery(GetSQLHandle(),
+    mysql_tquery(GetMySQLHandle(),
         "CREATE TABLE IF NOT EXISTS "T_ACCOUNT" \
         ("F_ACCOUNTID" INTEGER AUTO_INCREMENT, \
         "F_USERNAME" VARCHAR(24) NOT NULL, \
@@ -81,7 +81,7 @@ hook OnPlayerConnect(playerid) {
     playerRegisterDate[playerid][0] =
     playerLastLoginDate[playerid][0] = EOS;
 
-    new 
+    new
         playerName[MAX_PLAYER_NAME];
 
     GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -92,7 +92,7 @@ hook OnPlayerConnect(playerid) {
             cache_get_value_name_int(0, F_ACCOUNTID, playerAccountID[playerid]);
             cache_get_value_name(0, F_HASH, playerSalt[playerid], MAX_HASH);
             cache_get_value_name(0, F_PASSWORD, playerPassword[playerid], MAX_PASSWORD);
-            
+
             PromptLogin(playerid);
 
         } else {
@@ -100,7 +100,7 @@ hook OnPlayerConnect(playerid) {
         }
 
     }
-    MySQL_TQueryInline(GetSQLHandle() , using inline LoadAccountData, "SELECT "F_ACCOUNTID", "F_PASSWORD", "F_HASH" FROM "T_ACCOUNT" WHERE "F_USERNAME" ='%e' LIMIT 1", playerName);
+    MySQL_PQueryInline(GetMySQLHandle() , using inline LoadAccountData, "SELECT "F_ACCOUNTID", "F_PASSWORD", "F_HASH" FROM "T_ACCOUNT" WHERE "F_USERNAME" ='%e' LIMIT 1", playerName);
     return 1;
 }
 
@@ -116,7 +116,7 @@ LoadAccount(playerid, const password[]) {
         PromptLogin(playerid);
         return 1;
     }
-    
+
     inline const AccountDataLoaded() {
         new
             wantedLevel,
@@ -124,11 +124,11 @@ LoadAccount(playerid, const password[]) {
             playerMoney,
             playerScore,
             playerExperience
-        ;   
+        ;
 
         cache_get_value_name(0, "reg_date", playerRegisterDate[playerid], 40);
         cache_get_value_name(0, "last_log", playerLastLoginDate[playerid], 40);
-        
+
         cache_get_value_name_int(0, F_MONEY, playerMoney);
         GivePlayerMoney(playerid, playerMoney);
 
@@ -137,7 +137,7 @@ LoadAccount(playerid, const password[]) {
 
         cache_get_value_name_int(0, F_EXP, playerExperience);
         SetPlayerXP(playerid, playerExperience, true);
-       
+
         cache_get_value_name_int(0, F_JOB, playerJob);
         SetPlayerJob(playerid, playerJob);
 
@@ -145,23 +145,23 @@ LoadAccount(playerid, const password[]) {
         cache_get_value_name_int(0, F_DEATHS, playerDeaths[playerid]);
 
         cache_get_value_name_int(0, F_WANTEDLVL, wantedLevel);
-       
+
 
         if(wantedLevel > 0) {
             SetPlayerWantedLevel(playerid, wantedLevel);
             SendServerMsgF(playerid, "Continuing your last wanted level when you left - Wanted Level: "C_GREY"%i", wantedLevel);
         }
-        mysql_tquery(GetSQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_LAST_LOG" = CURRENT_TIMESTAMP() WHERE "F_ACCOUNTID" = %i", GetPlayerAccountID(playerid)));
 
-        CallLocalFunction("OnPlayerLogin", "i", playerid);
-        
         SendServerMsg(playerid, "You have successfully logged in to your account! Welcome back!");
+        CallLocalFunction("OnPlayerLogin", "i", playerid);
+
+        mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_LAST_LOG" = CURRENT_TIMESTAMP() WHERE "F_ACCOUNTID" = %i", GetPlayerAccountID(playerid)));
     }
 
-    MySQL_PQueryInline(GetSQLHandle(), using inline AccountDataLoaded,
-        "SELECT *, DATE_FORMAT("F_REG_DATE", '"SQL_DATE_FORMAT"') as reg_date, \
+    MySQL_PQueryInline(GetMySQLHandle(), using inline AccountDataLoaded,
+        "SELECT "F_MONEY", "F_KILLS", "F_DEATHS", "F_JOB", "F_SCORE", "F_EXP", "F_WANTEDLVL", DATE_FORMAT("F_REG_DATE", '"SQL_DATE_FORMAT"') as reg_date, \
         DATE_FORMAT("F_LAST_LOG", '"SQL_DATETIME_FORMAT"') as last_log \
-        FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i LIMIT 1", GetPlayerAccountID(playerid)); 
+        FROM "T_ACCOUNT" WHERE "F_ACCOUNTID" = %i LIMIT 1", GetPlayerAccountID(playerid));
     return 1;
 
 }
@@ -188,7 +188,7 @@ GetPlayerRegisterDate(playerid, date[], length) {
 
 stock hk_SetPlayerScore(playerid, score)
 {
-    mysql_tquery(GetSQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_SCORE" = %i WHERE "F_ACCOUNTID" = %i", score, GetPlayerAccountID(playerid)));
+    mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "T_ACCOUNT" SET "F_SCORE" = %i WHERE "F_ACCOUNTID" = %i", score, GetPlayerAccountID(playerid)));
     return SetPlayerScore(playerid, score);
 }
 #if defined _ALS_SetPlayerScore

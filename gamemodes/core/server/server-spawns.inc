@@ -29,12 +29,12 @@ static
 	lastSpawnID[MAX_PLAYERS] = -1;
 
 /*
-	Hook 
+	Hook
 		-> Create the table in our database if it doesn't exist.
 */
 hook OnGameModeInit()
 {
-	mysql_tquery(GetSQLHandle(), "CREATE TABLE IF NOT EXISTS "T_SPAWNPOINTS" (\
+	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "T_SPAWNPOINTS" (\
 		"F_SPAWN_ID" TINYINT(3) NOT NULL DEFAULT 0,\
 		"F_SPAWN_POS_X" FLOAT NOT NULL,\
 		"F_SPAWN_POS_Y" FLOAT NOT NULL,\
@@ -52,15 +52,16 @@ hook OnGameModeInit()
 */
 AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 {
-	new id = Iter_Free(spawn_Index);
+	new
+		id = Iter_Free(spawn_Index);
 	CreateSpawnPoint(id, X, Y, Z, A);
-    
-    new 
+
+    new
     	query[128];
-   	mysql_format(GetSQLHandle(), query, sizeof(query), "INSERT INTO "T_SPAWNPOINTS" \
+   	mysql_format(GetMySQLHandle(), query, sizeof(query), "INSERT INTO "T_SPAWNPOINTS" \
    		("F_SPAWN_ID", "F_SPAWN_POS_X", "F_SPAWN_POS_Y", "F_SPAWN_POS_Z", "F_SPAWN_POS_A") \
    		VALUES (%i, %0.2f, %0.2f, %0.2f, %0.2f)", id, X, Y, Z, A);
- 	mysql_tquery(GetSQLHandle(), query, "", "");
+ 	mysql_tquery(GetMySQLHandle(), query, "", "");
     return 1;
 }
 
@@ -68,7 +69,7 @@ AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 	Function:
 		CreateSpawnPoint(ID, Float:X, Float:Y, Float:Z, Float:A)
 	Information:
-		Create spawnpoint on specified coordinates, this function should only be used under AddSpawnPoint, 
+		Create spawnpoint on specified coordinates, this function should only be used under AddSpawnPoint,
 		if you want to create a new spawnpoint and save it to database function AddSpawnPoint should be used.
 */
 CreateSpawnPoint(ID, Float:X, Float:Y, Float:Z, Float:A)
@@ -88,7 +89,7 @@ CreateSpawnPoint(ID, Float:X, Float:Y, Float:Z, Float:A)
 
 /*
 	Function:
-		RemoveSpawnPoint(spawnid) 
+		RemoveSpawnPoint(spawnid)
 	Information:
 		Removes the spawnpoint from the server and delete it from the database based on spawnid given.
 */
@@ -100,33 +101,33 @@ RemoveSpawnPoint(spawnid)
     if (!Iter_Contains(spawn_Index, spawnid))
             return 0;
 
-    mysql_format(GetSQLHandle(), query, sizeof(query), "DELETE FROM "T_SPAWNPOINTS" WHERE "F_SPAWN_ID" = %i", spawnid);
-    mysql_tquery(GetSQLHandle(), query);
+    mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_SPAWNPOINTS" WHERE "F_SPAWN_ID" = %i", spawnid);
+    mysql_tquery(GetMySQLHandle(), query);
 
 	spawn_data[spawnid][spawn_id] = -1;
-    spawn_data[spawnid][spawn_posX] = 
-    spawn_data[spawnid][spawn_posY] = 
-    spawn_data[spawnid][spawn_posZ] = 
+    spawn_data[spawnid][spawn_posX] =
+    spawn_data[spawnid][spawn_posY] =
+    spawn_data[spawnid][spawn_posZ] =
     spawn_data[spawnid][spawn_posA] = 0.0;
     Iter_Remove(spawn_Index, spawnid);
     return 1;
 }
- 
+
 /*
 	Function:
 		LoadSpawns()
 	Information:
-		Retrieves coordinates from the database and create the spawnpoint in-game. 
+		Retrieves coordinates from the database and create the spawnpoint in-game.
 		If there is no data to be retrieved, we will create 10 default spawnpoints to avoid run-time error.
 */
 LoadSpawns()
-{    
+{
 	inline OnLoadSpawnPoint() {
-		new 
-			_spawnID, 
-			Float:_spawnX, 
-			Float:_spawnY, 
-			Float:_spawnZ, 
+		new
+			_spawnID,
+			Float:_spawnX,
+			Float:_spawnY,
+			Float:_spawnZ,
 			Float:_spawnAng
 		;
 
@@ -153,8 +154,8 @@ LoadSpawns()
 		}
 	}
 	MySQL_TQueryInline(
-		GetSQLHandle(), 
-		using inline OnLoadSpawnPoint, 
+		GetMySQLHandle(),
+		using inline OnLoadSpawnPoint,
 		"SELECT * FROM  "T_SPAWNPOINTS""
 	);
 }
@@ -168,15 +169,15 @@ LoadSpawns()
 SpawnPlayerToSpawnPoint(playerid) {
 
 	new ranspawn_ID = Iter_Random(spawn_Index);
-	
+
 	if (lastSpawnID[playerid] == ranspawn_ID) {
         return SpawnPlayerToSpawnPoint(playerid);
     }
-    
+
 	SetPlayerPos(playerid, spawn_data[ranspawn_ID][spawn_posX], spawn_data[ranspawn_ID][spawn_posY], spawn_data[ranspawn_ID][spawn_posZ]);
 	SetPlayerFacingAngle(playerid, spawn_data[ranspawn_ID][spawn_posA]);
 	SetCameraBehindPlayer(playerid);
-	lastSpawnID[playerid] = ranspawn_ID; 
+	lastSpawnID[playerid] = ranspawn_ID;
     return 1;
 }
 
@@ -188,7 +189,7 @@ SpawnPlayerToSpawnPoint(playerid) {
 */
 ListSpawnPoint(playerid)
 {
-	new 
+	new
 		tmp_string[128],
 		string[512];
 
@@ -235,7 +236,7 @@ SendPlayerToSpawnPoint(playerid, spawnid) {
 	if(!IsValidSpawnPoint(spawnid)) {
 		return 0;
 	}
-	
+
 	SetPlayerPos(playerid, spawn_data[spawnid][spawn_posX], spawn_data[spawnid][spawn_posY], spawn_data[spawnid][spawn_posZ]);
 	SetPlayerFacingAngle(playerid, spawn_data[spawnid][spawn_posA]);
 	return 1;
