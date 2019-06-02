@@ -19,14 +19,15 @@ hook OnGameModeInit()
         PRIMARY KEY ("F_VIP_OWNERID"), \
         FOREIGN KEY ("F_VIP_OWNERID") REFERENCES "T_ACCOUNT"("F_ACCOUNTID") ON DELETE CASCADE ON UPDATE RESTRICT)"
     );
+    return 1;
 }
 
 hook OnPlayerLogin(playerid) {
     inline OnPlayerVIPLoad() {
         if(cache_num_rows()) {
             new
-                expire,
-                expiry_date[20];
+            expire,
+            expiry_date[20];
 
             cache_get_value_name_int(0, F_VIP_LEVEL, playerVIPLevel[playerid]);
             cache_get_value_name_int(0, "expire", expire);
@@ -45,6 +46,7 @@ hook OnPlayerLogin(playerid) {
         "SELECT *, DATE_FORMAT("F_VIP_EXPIRE", '"SQL_DATETIME_FORMAT"') as vip_expire_data, TIMESTAMPDIFF(SECOND, CURRENT_TIMESTAMP(), "F_VIP_EXPIRE") \
         FROM "T_VIP" WHERE "F_VIP_OWNERID" = %i LIMIT 1", GetPlayerAccountID(playerid)
     );
+    return 1;
 }
 
 GivePlayerVIP(playerid, level, interval_type, duration) {
@@ -70,6 +72,8 @@ RemovePlayerVIP(playerid) {
 	mysql_tquery(GetMySQLHandle(), query);
 }
 
+//
+//
 GetPlayerVIPLevel(playerid) {
     return playerVIPLevel[playerid];
 }

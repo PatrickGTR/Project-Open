@@ -14,11 +14,11 @@ stock bool:RandomChance(chance_val) {
 	return (chance_val >= rnd_chance) ?  true : false;
 }
 
-Float:Distance(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2) {
+stock Float:Distance(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2) {
 	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
 }
 
-Float:PointAngle(playerid, Float:xa, Float:ya, Float:xb, Float:yb) {
+stock Float:PointAngle(playerid, Float:xa, Float:ya, Float:xb, Float:yb) {
 	new Float:carangle;
 	new Float:xc, Float:yc;
 	new Float:angle;

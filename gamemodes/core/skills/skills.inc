@@ -76,6 +76,7 @@ hook OnGameModeInit() {
 		FOREIGN KEY("F_FK_USER_ID") REFERENCES "T_ACCOUNT"("F_ACCOUNTID") ON DELETE CASCADE ON UPDATE CASCADE, \
         FOREIGN KEY("F_FK_SKILLID") REFERENCES "T_SKILL_TYPE"("F_SKILL_ID") ON DELETE CASCADE ON UPDATE CASCADE)"
     );
+    return 1;
 }
 
 hook OnPlayerDisconnect(playerid, reason)
@@ -83,6 +84,7 @@ hook OnPlayerDisconnect(playerid, reason)
     new
         empty_data[E_PLAYER_SKILL_DATA];
     playerSkills[playerid] = empty_data;
+    return 1;
 }
 
 hook OnPlayerLogin(playerid) {
@@ -135,7 +137,7 @@ hook OnPlayerLogin(playerid) {
         ON p."F_FK_SKILLID" = s."F_SKILL_ID" \
         WHERE p."F_FK_USER_ID" = %i", GetPlayerAccountID(playerid)
     );
-
+    return 1;
 }
 
 
