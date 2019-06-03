@@ -15,26 +15,26 @@
 
 enum _: E_MYSQL_ITEM_ID
 {
-    WEED_ITEM_ID = 0,       // 00
-    CRACK_ITEM_ID,          // 01
-    ROPE_ITEM_ID,           // 02
-    PICKLOCK_ITEM_ID,       // 03
-    SCISSORS_ITEM_ID,       // 04
-    CONDOM_ITEM_ID,         // 05
-    WALLET_ITEM_ID,         // 06
-    C4_ITEM_ID              // 07
+    E_WEED_ITEMID = 0,       // 00
+    E_CRACK_ITEMID,          // 01
+    E_ROPE_ITEMID,           // 02
+    E_PICKLOCK_ITEMID,       // 03
+    E_SCISSORS_ITEMID,       // 04
+    E_CONDOM_ITEMID,         // 05
+    E_WALLET_ITEMID,         // 06
+    E_C4_ITEMID              // 07
 }
 
 enum E_PLAYER_ITEMS
 {
-    P_WEED,
-    P_CRACK,
-    P_ROPE,
-    P_PICKLOCK,
-    P_SCISSORS,
-    P_CONDOM,
-    P_WALLET,
-    P_C4
+    E_PLAYER_WEED,
+    E_PLAYER_CRACK,
+    E_PLAYER_ROPE,
+    E_PLAYER_PICKLOCK,
+    E_PLAYER_SCISSORS,
+    E_PLAYER_CONDOM,
+    E_PLAYER_WALLET,
+    E_PLAYER_C4
 }
 static
     playerItems[MAX_PLAYERS][E_PLAYER_ITEMS]
@@ -98,22 +98,22 @@ hook OnPlayerLogin(playerid)
 
 				switch(item_id)
 				{
-					case WEED_ITEM_ID:
-						playerItems[playerid][P_WEED] = item_val;
-					case CRACK_ITEM_ID:
-						playerItems[playerid][P_CRACK] = item_val;
-					case ROPE_ITEM_ID:
-						playerItems[playerid][P_ROPE] = item_val;
-					case PICKLOCK_ITEM_ID:
-						playerItems[playerid][P_PICKLOCK] = item_val;
-					case SCISSORS_ITEM_ID:
-						playerItems[playerid][P_SCISSORS] = item_val;
-					case CONDOM_ITEM_ID:
-						playerItems[playerid][P_CONDOM] = item_val;
-					case WALLET_ITEM_ID:
-						playerItems[playerid][P_WALLET] = item_val;
-					case C4_ITEM_ID:
-						playerItems[playerid][P_C4] = item_val;
+					case E_WEED_ITEMID:
+						playerItems[playerid][E_PLAYER_WEED] = item_val;
+					case E_CRACK_ITEMID:
+						playerItems[playerid][E_PLAYER_CRACK] = item_val;
+					case E_ROPE_ITEMID:
+						playerItems[playerid][E_PLAYER_ROPE] = item_val;
+					case E_PICKLOCK_ITEMID:
+						playerItems[playerid][E_PLAYER_PICKLOCK] = item_val;
+					case E_SCISSORS_ITEMID:
+						playerItems[playerid][E_PLAYER_SCISSORS] = item_val;
+					case E_CONDOM_ITEMID:
+						playerItems[playerid][E_PLAYER_CONDOM] = item_val;
+					case E_WALLET_ITEMID:
+						playerItems[playerid][E_PLAYER_WALLET] = item_val;
+					case E_C4_ITEMID:
+						playerItems[playerid][E_PLAYER_C4] = item_val;
 				}
 			}
 
@@ -138,17 +138,17 @@ hook OnPlayerLogin(playerid)
     GetPlayerWeed(playerid)
 */
 
-SetPlayerWeed(playerid, amount, item_id = WEED_ITEM_ID)
+SetPlayerWeed(playerid, amount, item_id = E_WEED_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_WEED] = amount;
+    return playerItems[playerid][E_PLAYER_WEED] = amount;
 }
 
 GivePlayerWeed(playerid, amount)
     return SetPlayerWeed(playerid, GetPlayerWeed(playerid) + amount);
 GetPlayerWeed(playerid)
-    return playerItems[playerid][P_WEED];
+    return playerItems[playerid][E_PLAYER_WEED];
 
 /*
     [USAGE]
@@ -158,18 +158,18 @@ GetPlayerWeed(playerid)
     GetPlayerCrack(playerid)
 */
 
-SetPlayerCrack(playerid, amount, item_id = CRACK_ITEM_ID)
+SetPlayerCrack(playerid, amount, item_id = E_CRACK_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_CRACK] = amount;
+    return playerItems[playerid][E_PLAYER_CRACK] = amount;
 }
 
 GivePlayerCrack(playerid, amount)
     return SetPlayerCrack(playerid, GetPlayerCrack(playerid) + amount);
 
 GetPlayerCrack(playerid)
-    return playerItems[playerid][P_CRACK];
+    return playerItems[playerid][E_PLAYER_CRACK];
 
 /*
     [USAGE]
@@ -179,17 +179,17 @@ GetPlayerCrack(playerid)
     GetPlayerRope(playerid)
 */
 
-SetPlayerRope(playerid, amount, item_id = ROPE_ITEM_ID)
+SetPlayerRope(playerid, amount, item_id = E_ROPE_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_ROPE] = amount;
+    return playerItems[playerid][E_PLAYER_ROPE] = amount;
 }
 
 GivePlayerRope(playerid, amount)
     return SetPlayerRope(playerid, GetPlayerRope(playerid) + amount);
 GetPlayerRope(playerid)
-    return playerItems[playerid][P_ROPE];
+    return playerItems[playerid][E_PLAYER_ROPE];
 
 /*
     [USAGE]
@@ -199,17 +199,17 @@ GetPlayerRope(playerid)
     GetPlayerCondom(playerid)
 */
 
-SetPlayerCondom(playerid, amount, item_id = CONDOM_ITEM_ID)
+SetPlayerCondom(playerid, amount, item_id = E_CONDOM_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_CONDOM] = amount;
+    return playerItems[playerid][E_PLAYER_CONDOM] = amount;
 }
 
 GivePlayerCondom(playerid, amount)
     return SetPlayerCondom(playerid, GetPlayerCondom(playerid) + amount);
 GetPlayerCondom(playerid)
-    return playerItems[playerid][P_CONDOM];
+    return playerItems[playerid][E_PLAYER_CONDOM];
 
 /*
     [USAGE]
@@ -218,18 +218,18 @@ GetPlayerCondom(playerid)
     GivePlayerWallet(playerid, amount)
     GetPlayerWallet(playerid)
 */
-SetPlayerWallet(playerid, amount, item_id = WALLET_ITEM_ID)
+SetPlayerWallet(playerid, amount, item_id = E_WALLET_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_WALLET] = amount;
+    return playerItems[playerid][E_PLAYER_WALLET] = amount;
 }
 
 GivePlayerWallet(playerid, amount)
     return SetPlayerWallet(playerid, GetPlayerWallet(playerid) + amount);
 
 GetPlayerWallet(playerid)
-    return playerItems[playerid][P_WALLET];
+    return playerItems[playerid][E_PLAYER_WALLET];
 
 /*
     [USAGE]
@@ -238,17 +238,17 @@ GetPlayerWallet(playerid)
     GivePlayerPickLock(playerid, amount)
     GetPlayerPickLock(playerid)
 */
-SetPlayerPickLock(playerid, amount, item_id = PICKLOCK_ITEM_ID)
+SetPlayerPickLock(playerid, amount, item_id = E_PICKLOCK_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_PICKLOCK] = amount;
+    return playerItems[playerid][E_PLAYER_PICKLOCK] = amount;
 }
 
 GivePlayerPickLock(playerid, amount)
     return SetPlayerPickLock(playerid, GetPlayerPickLock(playerid) + amount);
 GetPlayerPickLock(playerid)
-    return playerItems[playerid][P_PICKLOCK];
+    return playerItems[playerid][E_PLAYER_PICKLOCK];
 
 
 /*
@@ -258,18 +258,18 @@ GetPlayerPickLock(playerid)
     GivePlayerScissors(playerid, amount)
     GetPlayerScissors(playerid)
 */
-SetPlayerScissors(playerid, amount, item_id = SCISSORS_ITEM_ID)
+SetPlayerScissors(playerid, amount, item_id = E_SCISSORS_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_SCISSORS] = amount;
+    return playerItems[playerid][E_PLAYER_SCISSORS] = amount;
 }
 
 GivePlayerScissors(playerid, amount)
     return SetPlayerScissors(playerid, GetPlayerPickLock(playerid) + amount);
 
 GetPlayerScissors(playerid)
-    return playerItems[playerid][P_SCISSORS];
+    return playerItems[playerid][E_PLAYER_SCISSORS];
 
 /*
     [USAGE]
@@ -278,18 +278,18 @@ GetPlayerScissors(playerid)
     GivePlayerC4(playerid, amount)
     GetPlayerC4(playerid)
 */
-SetPlayerC4(playerid, amount, item_id = C4_ITEM_ID)
+SetPlayerC4(playerid, amount, item_id = E_C4_ITEMID)
 {
     mysql_tquery(GetMySQLHandle(), sprintf("INSERT INTO "TABLE_ITEMPLAYERS" ("FIELD_FK_USERID", "FIELD_FK_ITEMID", "FIELD_VALUE") \
        VALUES (%i, %i, %i) ON DUPLICATE KEY UPDATE "FIELD_VALUE" = %i", GetPlayerAccountID(playerid), item_id, amount, amount));
-    return playerItems[playerid][P_C4] = amount;
+    return playerItems[playerid][E_PLAYER_C4] = amount;
 }
 
 GivePlayerC4(playerid, amount)
     return SetPlayerC4(playerid, GetPlayerC4(playerid) + amount);
 
 GetPlayerC4(playerid)
-    return playerItems[playerid][P_C4];
+    return playerItems[playerid][E_PLAYER_C4];
 
 
 #include <items-shop>

@@ -6,11 +6,11 @@
 
 enum
 {
-    ADM_LVL_1 = 1,
-    ADM_LVL_2,
-    ADM_LVL_3,
-    ADM_LVL_4,
-    ADM_LVL_5
+    E_ADM_LVL_1 = 1,
+    E_ADM_LVL_2,
+    E_ADM_LVL_3,
+    E_ADM_LVL_4,
+    E_ADM_LVL_5
 }
 
 new
@@ -92,7 +92,7 @@ SendAdminMessageF(const fmat[], {Float,_}:...)
 
 AddAdminCommandToList(level, const string[])
 {
-    if (!(ADM_LVL_1 <= level <= ADM_LVL_5))
+    if (!(E_ADM_LVL_1 <= level <= E_ADM_LVL_5))
     {
         printf("ERROR: Cannot register admin command for level %d", level);
         return 0;
@@ -139,7 +139,7 @@ SetPlayerOnDuty(playerid, bool:toggle)
 {
     // TODO: Change colour when player is on duty.
 
-    Bit_Set(adminOnDuty, playerid, (toggle) ? (true) : (false));
+    Bit_Set(adminOnDuty, playerid, toggle);
     return 1;
 }
 

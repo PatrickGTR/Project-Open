@@ -4,7 +4,7 @@
 static
 	ply_currentXP[MAX_PLAYERS];
 
-SetPlayerXP(playerid, amount, bool:first_spawn = false)
+SetPlayerXP(playerid, amount, bool:first_spawn = false, bool:update = true)
 {
 	ply_currentXP[playerid] = amount;
 
@@ -25,8 +25,9 @@ SetPlayerXP(playerid, amount, bool:first_spawn = false)
 
 		defer HidePlayerXPTD(playerid);
 	}
-
-	mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_EXP" = %i WHERE "FIELD_ACCOUNTID" = %i", amount, GetPlayerAccountID(playerid)));
+	if(update) {
+		mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_EXP" = %i WHERE "FIELD_ACCOUNTID" = %i", amount, GetPlayerAccountID(playerid)));
+	}
 	return 1;
 }
 

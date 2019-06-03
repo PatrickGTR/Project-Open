@@ -17,8 +17,8 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 #undef MAX_PLAYERS
 #undef MAX_VEHICLES
 
-#define SV_NAME 			"Project Open"
-#define SV_CURRENT_BUILD	"1.0"
+#define SV_NAME 			        "Project Open"
+#define SV_CURRENT_BUILD	        "1.0"
 
 #define MAX_PLAYERS             	(32)
 #define MAX_VEHICLES                (1000)
@@ -32,10 +32,10 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 #define CHECKPOINT_STREAMDISTANCE   (50)
 #define MAPICON_STREAMDISTANCE      (300)
 
-#define STRLIB_RETURN_SIZE      (256) //re-defined for MySQL queries.
+#define STRLIB_RETURN_SIZE          (256) //re-defined for MySQL queries.
 
-#define SQL_DATETIME_FORMAT     "%%d, %%M, %%Y at %%r"
-#define SQL_DATE_FORMAT         "%%d %%M %%Y"
+#define SQL_DATETIME_FORMAT         "%%d, %%M, %%Y at %%r"
+#define SQL_DATE_FORMAT             "%%d %%M %%Y"
 
 #define KEY_AIM 128
 

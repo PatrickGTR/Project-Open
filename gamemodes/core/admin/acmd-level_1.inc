@@ -9,7 +9,7 @@ ACMD:[1]spec(playerid, params[]) {
     if(isnull(params) || !IsNumeric(params))
         return SendSyntaxMsg(playerid, "/spec <playerid>");
 
-    new 
+    new
         targetid = strval(params);
 
     if(targetid == playerid)
@@ -176,27 +176,27 @@ ACMD:[1]acmds(playerid, params[])
 
 	//strcat(tmp_string, "/a [message] - Staff chat channel");
 
-	if (GetPlayerAdminLevel(playerid) >= ADM_LVL_5)
+	if (GetPlayerAdminLevel(playerid) >= E_ADM_LVL_5)
 	{
 		strcat(tmp_string, "\n\n"C_YELLOW"(level 5)"C_WHITE"\n");
 		strcat(tmp_string, adminCommands[4]);
 	}
-	if (GetPlayerAdminLevel(playerid) >= ADM_LVL_4)
+	if (GetPlayerAdminLevel(playerid) >= E_ADM_LVL_4)
 	{
 		strcat(tmp_string, "\n\n"C_YELLOW"(level 4)"C_WHITE"\n");
 		strcat(tmp_string, adminCommands[3]);
 	}
-	if (GetPlayerAdminLevel(playerid) >= ADM_LVL_3)
+	if (GetPlayerAdminLevel(playerid) >= E_ADM_LVL_3)
 	{
 		strcat(tmp_string, "\n\n"C_YELLOW"(level 3)"C_WHITE"\n");
 		strcat(tmp_string, adminCommands[2]);
 	}
-	if (GetPlayerAdminLevel(playerid) >= ADM_LVL_2)
+	if (GetPlayerAdminLevel(playerid) >= E_ADM_LVL_2)
 	{
 		strcat(tmp_string, "\n\n"C_YELLOW"(level 2)"C_WHITE"\n");
 		strcat(tmp_string, adminCommands[1]);
 	}
-	if (GetPlayerAdminLevel(playerid) >= ADM_LVL_1)
+	if (GetPlayerAdminLevel(playerid) >= E_ADM_LVL_1)
 	{
 		strcat(tmp_string, ""C_YELLOW"(level 1)"C_WHITE"\n");
 		strcat(tmp_string, adminCommands[0]);

@@ -15,14 +15,14 @@ static
 
 enum //5 * 8 = 40 seconds to finish.
 {
-	SEQ_ADDCOCALEAVES = 0,
-	SEQ_POURCEMENT,
-	SEQ_POURGASOLINE,
-	SEQ_MIXINGREDIENTS,
-	SEQ_FILTERGASOLINE,
-	SEQ_EXTRACOCOALEAVES,
-	SEQ_MARINATE,
-	SEQ_FINISHED
+	E_SEQ_ADDCOCALEAVES = 0,
+	E_SEQ_POURCEMENT,
+	E_SEQ_POURGASOLINE,
+	E_SEQ_MIXINGREDIENTS,
+	E_SEQ_FILTERGASOLINE,
+	E_SEQ_EXTRACOCOALEAVES,
+	E_SEQ_MARINATE,
+	E_SEQ_FINISHED
 }
 
 
@@ -85,7 +85,7 @@ hook OnPlayerConnect(playerid)
 
 
 /* PRODUCING CRACK IMPLEMENTATIONS */
-ProduceCrack(playerid, seq = SEQ_ADDCOCALEAVES)
+ProduceCrack(playerid, seq = E_SEQ_ADDCOCALEAVES)
 {
 	if(gettime() < plyJustCreatedCocaine[playerid])
 		return SendErrorMsgF(playerid, "You've just produced crack cocaine recently, please wait.... "C_GREY"%i "C_WHITE"seconds", plyJustCreatedCocaine[playerid] - gettime());
@@ -99,13 +99,13 @@ ProduceCrack(playerid, seq = SEQ_ADDCOCALEAVES)
 	P_CRACKSequence[playerid] = seq;
 	switch(seq)
 	{
-		case SEQ_ADDCOCALEAVES:
+		case E_SEQ_ADDCOCALEAVES:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Pouring Cocoa...");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_ADDCOCALEAVES;
+			P_CRACKSequence[playerid]= E_SEQ_ADDCOCALEAVES;
 
 			crackProducingTimer[playerid] 	= repeat ProduceCrackUpdate(playerid);
 
@@ -117,55 +117,55 @@ ProduceCrack(playerid, seq = SEQ_ADDCOCALEAVES)
 			SetPlayerPos(playerid, DRUG_CREATION_POSX, DRUG_CREATION_POSY, DRUG_CREATION_POSZ);
 			ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 1, 1, 1, 1, 0, 1);
 		}
-		case SEQ_POURCEMENT:
+		case E_SEQ_POURCEMENT:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Pouring Cement...");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_POURCEMENT;
+			P_CRACKSequence[playerid]= E_SEQ_POURCEMENT;
 		}
-		case SEQ_POURGASOLINE:
+		case E_SEQ_POURGASOLINE:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Pouring Gasoline...");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_POURGASOLINE;
+			P_CRACKSequence[playerid]= E_SEQ_POURGASOLINE;
 		}
-		case SEQ_MIXINGREDIENTS:
+		case E_SEQ_MIXINGREDIENTS:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Mixing Ingridients..");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_MIXINGREDIENTS;
+			P_CRACKSequence[playerid]= E_SEQ_MIXINGREDIENTS;
 		}
-		case SEQ_FILTERGASOLINE:
+		case E_SEQ_FILTERGASOLINE:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Filtering Gasoline");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_FILTERGASOLINE;
+			P_CRACKSequence[playerid]= E_SEQ_FILTERGASOLINE;
 		}
-		case SEQ_EXTRACOCOALEAVES:
+		case E_SEQ_EXTRACOCOALEAVES:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Extracting Cocoa");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_EXTRACOCOALEAVES;
+			P_CRACKSequence[playerid]= E_SEQ_EXTRACOCOALEAVES;
 		}
-		case SEQ_MARINATE:
+		case E_SEQ_MARINATE:
 		{
 			PlayerTextDrawSetString(playerid, TD_CrackTitle, "Marinating Cocaine");
 			PlayerTextDrawShow(playerid, TD_CrackTitle);
 
 			ShowPlayerProgressBar(playerid, TD_CrackStatus);
-			P_CRACKSequence[playerid]= SEQ_MARINATE;
+			P_CRACKSequence[playerid]= E_SEQ_MARINATE;
 		}
-		case SEQ_FINISHED:
+		case E_SEQ_FINISHED:
 		{
 			SendClientMessage(playerid, COLOR_TEAL, "** CRACK COCAINE ** "C_WHITE"You have have produced 50 grams of crack cocaine.");
 			GivePlayerCrack(playerid, 5);
@@ -200,13 +200,13 @@ timer ProduceCrackUpdate[1000](playerid)
 
 		switch(P_CRACKSequence[playerid])
 		{
-			case SEQ_ADDCOCALEAVES: 	ProduceCrack(playerid, SEQ_POURCEMENT);
-			case SEQ_POURCEMENT: 		ProduceCrack(playerid, SEQ_POURGASOLINE);
-			case SEQ_POURGASOLINE: 		ProduceCrack(playerid, SEQ_MIXINGREDIENTS);
-			case SEQ_MIXINGREDIENTS: 	ProduceCrack(playerid, SEQ_FILTERGASOLINE);
-			case SEQ_FILTERGASOLINE: 	ProduceCrack(playerid, SEQ_EXTRACOCOALEAVES);
-			case SEQ_EXTRACOCOALEAVES: 	ProduceCrack(playerid, SEQ_MARINATE);
-			case SEQ_MARINATE: 			ProduceCrack(playerid, SEQ_FINISHED);
+			case E_SEQ_ADDCOCALEAVES: 	ProduceCrack(playerid, E_SEQ_POURCEMENT);
+			case E_SEQ_POURCEMENT: 		ProduceCrack(playerid, E_SEQ_POURGASOLINE);
+			case E_SEQ_POURGASOLINE: 		ProduceCrack(playerid, E_SEQ_MIXINGREDIENTS);
+			case E_SEQ_MIXINGREDIENTS: 	ProduceCrack(playerid, E_SEQ_FILTERGASOLINE);
+			case E_SEQ_FILTERGASOLINE: 	ProduceCrack(playerid, E_SEQ_EXTRACOCOALEAVES);
+			case E_SEQ_EXTRACOCOALEAVES: 	ProduceCrack(playerid, E_SEQ_MARINATE);
+			case E_SEQ_MARINATE: 			ProduceCrack(playerid, E_SEQ_FINISHED);
 		}
 	}
 

@@ -1,6 +1,6 @@
 
 #define MAX_HOUSE_INTERIORS     (10)
-#define MAX_H_DESCRIPTION       (32)
+#define MAX_HOUSE_DESCRIPTION       (32)
 #define MAX_HOUSE_PER_PLAYER    (1)
 
 #define INVALID_OWNER_ID        (-1)

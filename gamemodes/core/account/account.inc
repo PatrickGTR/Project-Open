@@ -37,8 +37,6 @@ static
     playerAccountID[MAX_PLAYERS],
     playerKills[MAX_PLAYERS],
     playerDeaths[MAX_PLAYERS],
-    playerPassword[MAX_PLAYERS][MAX_PASSWORD],
-    playerSalt[MAX_PLAYERS][MAX_HASH],
     playerRegisterDate[MAX_PLAYERS][40],
     playerLastLoginDate[MAX_PLAYERS][40];
 
@@ -77,54 +75,67 @@ hook OnPlayerDeath(playerid, killerid, reason) {
 }
 
 hook OnPlayerConnect(playerid) {
+    // reset player data
+    // ints
     playerAccountID[playerid] =
     playerKills[playerid] =
     playerDeaths[playerid] = 0;
-
-    playerPassword[playerid][0] =
-    playerSalt[playerid][0] =
+    // arrays/strings
     playerRegisterDate[playerid][0] =
     playerLastLoginDate[playerid][0] = EOS;
 
+    inline const LoadAccountData() {
+        if(cache_num_rows() > 0) {
+
+            new
+                playerSalt[MAX_HASH],
+                playerPassword[MAX_PASSWORD];
+            // retrieve accountid, salt and password from database.
+            // store accountID to playerAccountID
+            // store salt to playerSalt
+            // store password to playerPassword
+            cache_get_value_name_int(0, FIELD_ACCOUNTID, playerAccountID[playerid]);
+            cache_get_value_name(0, FIELD_SALT, playerSalt, MAX_HASH);
+            cache_get_value_name(0, FIELD_PASSWORD, playerPassword, MAX_PASSWORD);
+
+            // show the login dialog and pass the password and salt for
+            printf("OnPlayerConnect: salt: %s | password: %s", playerSalt, playerPassword);
+            PromptLogin(playerid, playerSalt, playerPassword);
+
+        } else {
+
+            // show the register dialog
+            PromptRegister(playerid);
+        }
+    }
+
+    // execute statement
     new
         playerName[MAX_PLAYER_NAME];
 
     GetPlayerName(playerid, playerName, sizeof(playerName));
-
-    inline const LoadAccountData() {
-
-        if(cache_num_rows() > 0) {
-            cache_get_value_name_int(0, FIELD_ACCOUNTID, playerAccountID[playerid]);
-            cache_get_value_name(0, FIELD_SALT, playerSalt[playerid], MAX_HASH);
-            cache_get_value_name(0, FIELD_PASSWORD, playerPassword[playerid], MAX_PASSWORD);
-
-            PromptLogin(playerid);
-
-        } else {
-            PromptRegister(playerid);
-        }
-
-    }
     MySQL_PQueryInline(GetMySQLHandle() , using inline LoadAccountData, "SELECT "FIELD_ACCOUNTID", "FIELD_PASSWORD", "FIELD_SALT" FROM "TABLE_ACCOUNT" WHERE "FIELD_USERNAME" ='%e' LIMIT 1", playerName);
     return 1;
 }
 
-LoadAccount(playerid, const password[]) {
+LoadAccount(playerid, const input_password[], const db_salt[], const db_password[]) {
     new
-        buf[65]
-    ;
+        buf[65];
+    // hash password
+    SHA256_PassHash(input_password, db_salt, buf, sizeof(buf));
 
-    SHA256_PassHash(password, playerSalt[playerid], buf, sizeof(buf));
-
-    if (!isequal(buf, playerPassword[playerid]) && !isnull(password)) {
+    // compare password
+    // if password from database isn't the same as the user input = wrong
+    // if password is empty = wrong
+    if (!isequal(buf, db_password) && !isnull(input_password)) {
         SendErrorMsg(playerid, "Incorrect password");
-        PromptLogin(playerid);
+        PromptLogin(playerid, db_salt, db_password);
         return 1;
     }
 
     inline const AccountDataLoaded() {
         new
-            wantedLevel,
+            playerWantedLevel,
             playerJob,
             playerMoney,
             playerScore,
@@ -141,34 +152,37 @@ LoadAccount(playerid, const password[]) {
         SetPlayerScore(playerid, playerScore);
 
         cache_get_value_name_int(0, FIELD_EXP, playerExperience);
-        SetPlayerXP(playerid, playerExperience, true);
+        SetPlayerXP(playerid, playerExperience, .first_spawn=true, .update=false);
 
         cache_get_value_name_int(0, FIELD_JOB, playerJob);
         SetPlayerJob(playerid, playerJob);
 
         cache_get_value_name_int(0, FIELD_KILLS, playerKills[playerid]);
         cache_get_value_name_int(0, FIELD_DEATHS, playerDeaths[playerid]);
+        cache_get_value_name_int(0, FIELD_WANTEDLVL, playerWantedLevel);
 
-        cache_get_value_name_int(0, FIELD_WANTEDLVL, wantedLevel);
-
-
-        if(wantedLevel > 0) {
-            SetPlayerWantedLevel(playerid, wantedLevel);
-            SendServerMsgF(playerid, "Continuing your last wanted level when you left - Wanted Level: "C_GREY"%i", wantedLevel);
+        // if the player left with wanted level we give him his last wanted level.
+        if(playerWantedLevel > 0) {
+            SetPlayerWantedLevel(playerid, playerWantedLevel);
+            SendServerMsgF(playerid, "Continuing your last wanted level when you left - Wanted Level: "C_GREY"%i", playerWantedLevel);
         }
 
+        // notify player that
         SendServerMsg(playerid, "You have successfully logged in to your account! Welcome back!");
+
+        // called when player has fully signed in.
         CallLocalFunction("OnPlayerLogin", "i", playerid);
 
-        mysql_tquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_LAST_LOG" = CURRENT_TIMESTAMP() WHERE "FIELD_ACCOUNTID" = %i", GetPlayerAccountID(playerid)));
+        // update player's last login date.
+        mysql_pquery(GetMySQLHandle(), sprintf("UPDATE "TABLE_ACCOUNT" SET "FIELD_LAST_LOG" = CURRENT_TIMESTAMP() WHERE "FIELD_ACCOUNTID" = %i", GetPlayerAccountID(playerid)));
     }
 
-    MySQL_PQueryInline(GetMySQLHandle(), using inline AccountDataLoaded,
+    // execute statement
+    MySQL_TQueryInline(GetMySQLHandle(), using inline AccountDataLoaded,
         "SELECT "FIELD_MONEY", "FIELD_KILLS", "FIELD_DEATHS", "FIELD_JOB", "FIELD_SCORE", "FIELD_EXP", "FIELD_WANTEDLVL", DATE_FORMAT("FIELD_REG_DATE", '"SQL_DATE_FORMAT"') as reg_date, \
         DATE_FORMAT("FIELD_LAST_LOG", '"SQL_DATETIME_FORMAT"') as last_log \
         FROM "TABLE_ACCOUNT" WHERE "FIELD_ACCOUNTID" = %i LIMIT 1", GetPlayerAccountID(playerid));
     return 1;
-
 }
 
 GetPlayerAccountID(playerid) {

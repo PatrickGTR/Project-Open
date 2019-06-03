@@ -2,34 +2,31 @@
 
 #include <enter-exit-api>
 
-enum E_STORE_DATA
+static enum E_STORE_DATA
 {
-    mapIcon,
-    storeName[24],
-    Float:entPos[4],
-    Float:extPos[4],
-    Float:actorPos[4],
-    actorSkinID,
-    interiorID,
-
-    virtualID,
-    entPickup,
-    extPickup
+    E_STORE_MAPICON,
+    E_STORE_NAME[24],
+    Float:E_STORE_ENT[4],
+    Float:E_STORE_EXT[4],
+    Float:E_STORE_ACTOR[4],
+    E_ACTOR_SKINID,
+    E_ACTOR_INTERIORID,
 }
 
 static const storeData[][E_STORE_DATA] =
 {
 
     /*
-        00 -> MapIcon
-        01 -> EntX
-        02 -> EntY
-        03 -> EntZ
-        04 -> EntAngle
-        05 -> ExtX
-        06 -> ExtY
-        07 -> ExtZ
-        08 -> ExtAngle
+        00 -> Map Icon
+        01 -> Entrance X
+        02 -> Entrance Y
+        03 -> Entrance Z
+        04 -> Entrance Angle
+        05 -> Exit X
+        06 -> Exit Y
+        07 -> Exit Z
+        08 -> Exit Angle
+
         14 -> InteriorID
     */
 
@@ -74,29 +71,27 @@ hook OnGameModeInit() {
     DisableInteriorEnterExits();
 
     // Store Entrance / Exits
-    new 
-        entid = 0
-    ;
+    new
+        entid = 0;
 
 	for(new i = 0; i != sizeof(storeData); ++i)
     {
 		entid = CreateEntrance(
-			storeData[i][entPos][0], storeData[i][entPos][1], storeData[i][entPos][2], storeData[i][entPos][3], 
-			storeData[i][extPos][0], storeData[i][extPos][1], storeData[i][extPos][2], storeData[i][extPos][3], i, storeData[i][interiorID]);
-		
-        CreateMapIconOnEntrance(entid, storeData[i][mapIcon]);
-        SetEntranceName(entid, storeData[i][storeName]);
+			storeData[i][E_STORE_ENT][0], storeData[i][E_STORE_ENT][1], storeData[i][E_STORE_ENT][2], storeData[i][E_STORE_ENT][3],
+			storeData[i][E_STORE_EXT][0], storeData[i][E_STORE_EXT][1], storeData[i][E_STORE_EXT][2], storeData[i][E_STORE_EXT][3], i, storeData[i][E_ACTOR_INTERIORID]);
 
-        CreateActorRobbery(sprintf("%s\n[AIM TO ROB]", storeData[i][storeName]), storeData[i][actorSkinID], storeData[i][actorPos][0],  storeData[i][actorPos][1], storeData[i][actorPos][2]+1.2, storeData[i][actorPos][3], i);
+        CreateMapIconOnEntrance(entid, storeData[i][E_STORE_MAPICON]);
+        SetEntranceName(entid, storeData[i][E_STORE_NAME]);
+
+        CreateActorRobbery(sprintf("%s\n[AIM TO ROB]", storeData[i][E_STORE_NAME]), storeData[i][E_ACTOR_SKINID], storeData[i][E_STORE_ACTOR][0],  storeData[i][E_STORE_ACTOR][1], storeData[i][E_STORE_ACTOR][2]+1.2, storeData[i][E_STORE_ACTOR][3], i);
 	}
 
-    
 
-    new 
+    new
         sf_drugHouseEnt,
         sf_bankEnt,
         sf_policeStation;
-        
+
     sf_drugHouseEnt = CreateEntrance(
         -1896.6683, 487.1766, 35.1719, -93.5577,
         1456.7220, -988.0564, 996.1050, 88.5385, 1, 1

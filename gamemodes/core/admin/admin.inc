@@ -21,30 +21,30 @@ hook OnGameModeInit() {
     // Initiliase Commands
 
     // Level 1
-    AddAdminCommandToList(ADM_LVL_1, "/a");
-    AddAdminCommandToList(ADM_LVL_1, "/acmds");
-    AddAdminCommandToList(ADM_LVL_1, "/mute");
-    AddAdminCommandToList(ADM_LVL_1, "/unmute");
-    AddAdminCommandToList(ADM_LVL_1, "/freeze");
-    AddAdminCommandToList(ADM_LVL_1, "/unfreeze");
-    AddAdminCommandToList(ADM_LVL_1, "/spec");
-    AddAdminCommandToList(ADM_LVL_1, "/specoff");
+    AddAdminCommandToList(E_ADM_LVL_1, "/a");
+    AddAdminCommandToList(E_ADM_LVL_1, "/acmds");
+    AddAdminCommandToList(E_ADM_LVL_1, "/mute");
+    AddAdminCommandToList(E_ADM_LVL_1, "/unmute");
+    AddAdminCommandToList(E_ADM_LVL_1, "/freeze");
+    AddAdminCommandToList(E_ADM_LVL_1, "/unfreeze");
+    AddAdminCommandToList(E_ADM_LVL_1, "/spec");
+    AddAdminCommandToList(E_ADM_LVL_1, "/specoff");
 
     // Level 2
-    AddAdminCommandToList(ADM_LVL_2, "/goto");
-    AddAdminCommandToList(ADM_LVL_2, "/get");
+    AddAdminCommandToList(E_ADM_LVL_2, "/goto");
+    AddAdminCommandToList(E_ADM_LVL_2, "/get");
 
     // Level 3
-    AddAdminCommandToList(ADM_LVL_3, "/ban");
-    AddAdminCommandToList(ADM_LVL_3, "/unban");
+    AddAdminCommandToList(E_ADM_LVL_3, "/ban");
+    AddAdminCommandToList(E_ADM_LVL_3, "/unban");
 
     // Level 4
-    AddAdminCommandToList(ADM_LVL_4, "/setvip");
+    AddAdminCommandToList(E_ADM_LVL_4, "/setvip");
 
     // Level 5
-    AddAdminCommandToList(ADM_LVL_5, "/setadmin");
-    AddAdminCommandToList(ADM_LVL_5, "/delacc");
-    AddAdminCommandToList(ADM_LVL_5, "/mysqlstats");
+    AddAdminCommandToList(E_ADM_LVL_5, "/setadmin");
+    AddAdminCommandToList(E_ADM_LVL_5, "/delacc");
+    AddAdminCommandToList(E_ADM_LVL_5, "/mysqlstats");
 
     return 1;
 }

@@ -116,7 +116,7 @@ CMD:house(playerid, const params[])
     if (!strcmp(params, "description", true, 11))
     {
         new
-            description[MAX_H_DESCRIPTION];
+            description[MAX_HOUSE_DESCRIPTION];
 
         if (sscanf(params, "{s[12]}s[32]", description))
             return SendSyntaxMsg(playerid, "/house description <new description>");

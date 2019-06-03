@@ -143,7 +143,7 @@ IsPlayerBanned(playerid) {
             return 1;
         }
     }
-    MySQL_PQueryInline(
+    MySQL_TQueryInline(
         GetMySQLHandle(),
         using inline OnPlayerBanLoad,
         "SELECT *, DATE_FORMAT("FIELD_DATE",'"SQL_DATETIME_FORMAT"') AS date_ban, \

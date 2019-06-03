@@ -13,12 +13,12 @@ static const bombArray[][2] =
 
 enum E_ITEMS_SHOP
 {
-    ITEM_NAME[24],
-    ITEM_QTY,
-    ITEM_PRICE
+    E_ITEM_NAME[24],
+    E_ITEM_QTY,
+    E_ITEM_PRICE
 }
 
-static const itemsTwentyFourSeven[][E_ITEMS_SHOP] = 
+static const itemsTwentyFourSeven[][E_ITEMS_SHOP] =
     {
         //Piclock
         {"Picklock",            2,      1000 * 2},
@@ -66,7 +66,7 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
 {
 	if(checkpointid == bombShopCP_SF || checkpointid == bombShopCP_BC)
     {
-    	new 
+    	new
         	string[68/*68 characters per line*/* sizeof(bombArray)/*number of lines*/];
 
         inline DialogBombShopResponse(ply_id, dialogid, response, listitem, string:inputtext[])
@@ -84,7 +84,7 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
 
             SendMsgF(playerid, COLOR_ORANGE, "** BOMB SHOP ** "C_WHITE"You successfully bought "C_GREY"%i C4 "C_WHITE"for "C_GREEN"%m", bombArray[listitem][0], bombArray[listitem][1]);
             GivePlayerMoney(playerid, -bombArray[listitem][1]);
-            GivePlayerC4(playerid, bombArray[listitem][0]);       
+            GivePlayerC4(playerid, bombArray[listitem][0]);
         }
 
 
@@ -95,10 +95,10 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
         Dialog_ShowCallback(playerid, using inline DialogBombShopResponse, DIALOG_STYLE_LIST, ""C_ORANGE"Bomb Shop", string, "Purchase", "Close");
     }
     if(checkpointid == twentyFourSevenCP)
-    {        
-        new 
+    {
+        new
             tmp_string[32],
-            string[sizeof(tmp_string) * sizeof(itemsTwentyFourSeven)/*number of lines*/]; 
+            string[sizeof(tmp_string) * sizeof(itemsTwentyFourSeven)/*number of lines*/];
         inline TwentyFourSevenResponse(plyid, dialogid, response, listitem, string:inputtext[])
         {
             #pragma unused plyid, dialogid, inputtext
@@ -106,13 +106,13 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
             if(!response)
                 return false;
 
-            if(GetPlayerMoney(playerid) < itemsTwentyFourSeven[listitem][ITEM_PRICE])
+            if(GetPlayerMoney(playerid) < itemsTwentyFourSeven[listitem][E_ITEM_PRICE])
             {
-                SendErrorMsgF(playerid, "You don't have enough money to buy %s", itemsTwentyFourSeven[listitem][ITEM_NAME]);
+                SendErrorMsgF(playerid, "You don't have enough money to buy %s", itemsTwentyFourSeven[listitem][E_ITEM_NAME]);
                 Dialog_ShowCallback(playerid, using inline TwentyFourSevenResponse, DIALOG_STYLE_TABLIST_HEADERS, "24/7 Items", string, "Select", "Close");
                 return 1;
             }
-            if(GetPlayerPickLock(playerid) || GetPlayerCondom(playerid) || GetPlayerWallet(playerid) || GetPlayerRope(playerid) || GetPlayerScissors(playerid) >= MAX_ITEMS) 
+            if(GetPlayerPickLock(playerid) || GetPlayerCondom(playerid) || GetPlayerWallet(playerid) || GetPlayerRope(playerid) || GetPlayerScissors(playerid) >= MAX_ITEMS)
             {
                 SendErrorMsg(playerid, "You are currently holding the maximum amount of this time.");
                 Dialog_ShowCallback(playerid, using inline TwentyFourSevenResponse, DIALOG_STYLE_TABLIST_HEADERS, "24/7 Items", string, "Select", "Close");
@@ -123,11 +123,11 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
                 case 0: GivePlayerPickLock  (playerid, 2);
                 case 1: GivePlayerPickLock  (playerid, 10);
                 case 2: GivePlayerPickLock  (playerid, 15);
-    
+
                 case 3: GivePlayerCondom    (playerid, 2);
                 case 4: GivePlayerCondom    (playerid, 10);
                 case 5: GivePlayerCondom    (playerid, 15);
-        
+
                 case 6: GivePlayerWallet    (playerid, 2);
                 case 7: GivePlayerWallet    (playerid, 10);
                 case 8: GivePlayerWallet    (playerid, 15);
@@ -139,17 +139,17 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
                 case 12: GivePlayerScissors (playerid, 2);
                 case 13: GivePlayerScissors (playerid, 10);
                 case 14: GivePlayerScissors (playerid, 15);
-                
+
             }
-            SendServerMsgF(playerid, "You bought a "C_GREY"%s "C_WHITE"for "C_GREEN"%m "C_WHITE"from 24/7", itemsTwentyFourSeven[listitem][ITEM_NAME], itemsTwentyFourSeven[listitem][ITEM_PRICE]);
-            GivePlayerMoney(playerid, -itemsTwentyFourSeven[listitem][ITEM_PRICE]);
+            SendServerMsgF(playerid, "You bought a "C_GREY"%s "C_WHITE"for "C_GREEN"%m "C_WHITE"from 24/7", itemsTwentyFourSeven[listitem][E_ITEM_NAME], itemsTwentyFourSeven[listitem][E_ITEM_PRICE]);
+            GivePlayerMoney(playerid, -itemsTwentyFourSeven[listitem][E_ITEM_PRICE]);
         }
 
         strcat(string, "Item\tQuantity\tPrice\n");
         for(new i = 0; i < sizeof(itemsTwentyFourSeven); ++i)
         {
-            format(tmp_string, sizeof(tmp_string), "%s\t%i\t"C_GREEN"%m\n", 
-                 itemsTwentyFourSeven[i][ITEM_NAME], itemsTwentyFourSeven[i][ITEM_QTY], itemsTwentyFourSeven[i][ITEM_PRICE]);
+            format(tmp_string, sizeof(tmp_string), "%s\t%i\t"C_GREEN"%m\n",
+                 itemsTwentyFourSeven[i][E_ITEM_NAME], itemsTwentyFourSeven[i][E_ITEM_QTY], itemsTwentyFourSeven[i][E_ITEM_PRICE]);
 
             strcat(string, tmp_string, sizeof(string));
         }

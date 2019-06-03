@@ -1,10 +1,10 @@
 
 #define TABLE_HOUSE             "houses"
-#define FIELD_HOUSE_ID          "h_ID"
+#define FIELD_HOUSE_ID          "E_hOUSE_ID"
 #define FIELD_HOUSE_INTERIOR    "h_fk_intID"
-#define FIELD_HOUSE_OWNERID     "h_ownerID"
-#define FIELD_HOUSE_DESCRIPTION "h_description"
-#define FIELD_HOUSE_PRICE       "h_price"
+#define FIELD_HOUSE_OWNERID     "E_hOUSE_ownerID"
+#define FIELD_HOUSE_DESCRIPTION "E_hOUSE_description"
+#define FIELD_HOUSE_PRICE       "E_hOUSE_price"
 #define FIELD_HOUSE_CASH_STORED "h_cashstored"
 #define FIELD_HOUSE_ENT_X       "h_entX"
 #define FIELD_HOUSE_ENT_Y       "h_entY"
@@ -34,7 +34,7 @@
 #define H_LEVEL9_PRICE          (2750000)
 #define H_LEVEL10_PRICE         (3900000)
 
-enum E_HOUSE_INT_DATA
+static enum E_HOUSE_INT_DATA
 {
     H_INTLEVEL,
     H_INTINFO,
@@ -45,33 +45,33 @@ enum E_HOUSE_INT_DATA
     H_INTA
 }
 
-enum E_HOUSE_DATA
+static enum E_HOUSE_DATA
 {
-    H_DESC[MAX_H_DESCRIPTION],
-    H_ID,
-    H_OWNERID,
-    H_PRICE,
-    H_LEVEL,
+    E_HOUSE_DESC[MAX_HOUSE_DESCRIPTION],
+    E_HOUSE_ID,
+    E_HOUSE_OWNERID,
+    E_HOUSE_PRICE,
+    E_HOUSE,
     H_CASHSTORED,
 
-    Float:ENT_POSX,
-    Float:ENT_POSY,
-    Float:ENT_POSZ,
-    Float:ENT_POSA,
+    Float:E_HOUSE_ENT_X,
+    Float:E_HOUSE_ENT_Y,
+    Float:E_HOUSE_ENT_Z,
+    Float:E_HOUSE_ENT_A,
 
-    Float:EXT_POSX,
-    Float:EXT_POSY,
-    Float:EXT_POSZ,
-    Float:EXT_POSA,
+    Float:E_HOUSE_EXT_X,
+    Float:E_HOUSE_EXT_Y,
+    Float:E_HOUSE_EXT_Z,
+    Float:E_HOUSE_EXT_A,
 
-    EXT_VWID,
-    EXT_INTID,
+    E_HOUSE_EXT_VWID,
+    E_HOUSE_EXT_INTID,
 
     // DATA DOES NOT SAVE //
-    ENT_CP,
-    EXT_CP,
-    Text3D:ENT_LABEL,
-    Text3D:EXT_LABEL
+    E_ENT_CP,
+    E_EXT_CP,
+    Text3D:E_ENT_LABEL,
+    Text3D:E_EXT_LABEL
 }
 
 static
@@ -89,7 +89,7 @@ GetHouseEntranceCP(houseid) {
     if(houseid == INVALID_HOUSE_ID){
         return 0;
     }
-    return houseData[houseid][ENT_CP];
+    return houseData[houseid][E_ENT_CP];
 }
 
 /*
@@ -102,7 +102,7 @@ GetHouseExitCP(houseid) {
     if(houseid == INVALID_HOUSE_ID){
         return 0;
     }
-    return houseData[houseid][EXT_CP];
+    return houseData[houseid][E_EXT_CP];
 }
 
 /*
@@ -115,7 +115,7 @@ GetHouseInteriorLevel(houseid) {
     if(houseid == INVALID_HOUSE_ID){
             return 0;
     }
-    return houseData[houseid][H_LEVEL];
+    return houseData[houseid][E_HOUSE];
 }
 
 /*
@@ -130,7 +130,7 @@ GetHouseOwnerID(houseid) {
         return 0;
     }
 
-    return houseData[houseid][H_OWNERID];
+    return houseData[houseid][E_HOUSE_OWNERID];
 }
 
 /*
@@ -144,12 +144,12 @@ GetHouseExitData(houseid, &Float: x, &Float: y, &Float: z, &Float: ang, &int, &v
         return 0;
     }
 
-    x = houseData[houseid][EXT_POSX];
-    y = houseData[houseid][EXT_POSY];
-    z = houseData[houseid][EXT_POSZ];
-    ang = houseData[houseid][EXT_POSA];
-    vwid = houseData[houseid][EXT_VWID];
-    int = houseData[houseid][EXT_INTID];
+    x = houseData[houseid][E_HOUSE_EXT_X];
+    y = houseData[houseid][E_HOUSE_EXT_Y];
+    z = houseData[houseid][E_HOUSE_EXT_Z];
+    ang = houseData[houseid][E_HOUSE_EXT_A];
+    vwid = houseData[houseid][E_HOUSE_EXT_VWID];
+    int = houseData[houseid][E_HOUSE_EXT_INTID];
     return 1;
 }
 
@@ -164,10 +164,10 @@ GetHouseEntrancePos(houseid, &Float: x, &Float: y, &Float: z, &Float: ang) {
         return 0;
     }
 
-    x = houseData[houseid][ENT_POSX];
-    y = houseData[houseid][ENT_POSY];
-    z = houseData[houseid][ENT_POSZ];
-    ang = houseData[houseid][ENT_POSA];
+    x = houseData[houseid][E_HOUSE_ENT_X];
+    y = houseData[houseid][E_HOUSE_ENT_Y];
+    z = houseData[houseid][E_HOUSE_ENT_Z];
+    ang = houseData[houseid][E_HOUSE_ENT_A];
     return 1;
 }
 
@@ -180,7 +180,7 @@ LoadHouseInteriors() {
         if(rows) {
             for(new i = 0; i < rows; i++) {
                 cache_get_value_name_int    (i, FIELD_HOUSE_LEVEL, houseInteriorData[i][H_INTLEVEL]);
-                cache_get_value_name        (i, FIELD_HOUSE_INFO,  houseInteriorData[i][H_INTINFO], MAX_H_DESCRIPTION);
+                cache_get_value_name        (i, FIELD_HOUSE_INFO,  houseInteriorData[i][H_INTINFO], MAX_HOUSE_DESCRIPTION);
                 cache_get_value_name_int    (i, FIELD_HOUSE_EXT_X, houseInteriorData[i][H_INTX]);
                 cache_get_value_name_int    (i, FIELD_HOUSE_EXT_Y, houseInteriorData[i][H_INTY]);
                 cache_get_value_name_int    (i, FIELD_HOUSE_EXT_Z, houseInteriorData[i][H_INTZ]);
@@ -203,7 +203,7 @@ LoadHouses() {
             new
                 id,
                 ownerID,
-                description[MAX_H_DESCRIPTION],
+                description[MAX_HOUSE_DESCRIPTION],
                 price,
                 level,
                 Float:entposX,
@@ -224,7 +224,7 @@ LoadHouses() {
 
                 cache_get_value_name_int    (i, "ownerid", ownerID);
 
-                cache_get_value_name        (i, FIELD_HOUSE_DESCRIPTION, description, MAX_H_DESCRIPTION);
+                cache_get_value_name        (i, FIELD_HOUSE_DESCRIPTION, description, MAX_HOUSE_DESCRIPTION);
 
                 cache_get_value_name_int    (i, FIELD_HOUSE_PRICE, price);
                 cache_get_value_name_int    (i, FIELD_HOUSE_INTERIOR, level);
@@ -264,7 +264,7 @@ LoadHouses() {
 UpdateHouse(houseid, newownerID, const newdescription[])
 {
     new
-        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION]
+        string[128 + MAX_PLAYER_NAME + MAX_HOUSE_DESCRIPTION]
     ;
 
     if (houseid == INVALID_HOUSE_ID) {
@@ -272,12 +272,12 @@ UpdateHouse(houseid, newownerID, const newdescription[])
     }
 
     if(newownerID != INVALID_HOUSE_ID) {
-        houseData[houseid][H_OWNERID] = newownerID;
-        strcpy(houseData[houseid][H_DESC], newdescription, MAX_H_DESCRIPTION);
+        houseData[houseid][E_HOUSE_OWNERID] = newownerID;
+        strcpy(houseData[houseid][E_HOUSE_DESC], newdescription, MAX_HOUSE_DESCRIPTION);
 
         mysql_format(GetMySQLHandle(), string, sizeof(string),
         "UPDATE "TABLE_HOUSE" SET "FIELD_HOUSE_OWNERID" = %i, "FIELD_HOUSE_DESCRIPTION" = '%e', "FIELD_HOUSE_INTERIOR" = %i WHERE "FIELD_HOUSE_ID" = %i",
-        newownerID, newdescription, houseData[houseid][H_LEVEL], houseid);
+        newownerID, newdescription, houseData[houseid][E_HOUSE], houseid);
         mysql_tquery(GetMySQLHandle(), string);
     }
 
@@ -285,7 +285,7 @@ UpdateHouse(houseid, newownerID, const newdescription[])
         name_from_id[MAX_PLAYER_NAME]
     ;
 
-    GetPlayerNameFromAccountID(houseData[houseid][H_OWNERID], name_from_id);
+    GetPlayerNameFromAccountID(houseData[houseid][E_HOUSE_OWNERID], name_from_id);
 
     format(string, sizeof(string),
         "HouseID: "C_WHITE"%i\n\
@@ -293,12 +293,12 @@ UpdateHouse(houseid, newownerID, const newdescription[])
         "C_ORANGE"Owner: "C_WHITE"%s\n\
         "C_ORANGE"Level: "C_WHITE"%i\n\
         "C_ORANGE"Price: "C_WHITE"%m",
-        houseData[houseid][H_ID], houseData[houseid][H_DESC],
+        houseData[houseid][E_HOUSE_ID], houseData[houseid][E_HOUSE_DESC],
         "test",
-        houseData[houseid][H_LEVEL],
-        houseData[houseid][H_PRICE]);
+        houseData[houseid][E_HOUSE],
+        houseData[houseid][E_HOUSE_PRICE]);
 
-    UpdateDynamic3DTextLabelText(houseData[houseid][ENT_LABEL], COLOR_ORANGE, string);
+    UpdateDynamic3DTextLabelText(houseData[houseid][E_ENT_LABEL], COLOR_ORANGE, string);
     return 1;
 }
 
@@ -340,13 +340,13 @@ RemoveHouse(houseid) {
     inline OnHouseRemove() {
         if (cache_num_rows()) {
 
-            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][ENT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
-            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][EXT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
+            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][E_ENT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
+            Streamer_RemoveArrayData(STREAMER_TYPE_CP, houseData[houseid][E_EXT_CP], E_STREAMER_EXTRA_ID, HOUSES_STREAMER_IDENTIFIER);
 
-            DestroyDynamicCP(houseData[houseid][ENT_CP]);
-            DestroyDynamicCP(houseData[houseid][EXT_CP]);
-            DestroyDynamic3DTextLabel(houseData[houseid][ENT_LABEL]);
-            DestroyDynamic3DTextLabel(houseData[houseid][EXT_LABEL]);
+            DestroyDynamicCP(houseData[houseid][E_ENT_CP]);
+            DestroyDynamicCP(houseData[houseid][E_EXT_CP]);
+            DestroyDynamic3DTextLabel(houseData[houseid][E_ENT_LABEL]);
+            DestroyDynamic3DTextLabel(houseData[houseid][E_EXT_LABEL]);
 
             // delete from the database.
             mysql_tquery(GetMySQLHandle(), sprintf("DELETE FROM "TABLE_HOUSE" WHERE "FIELD_HOUSE_ID" = %i", houseid));
@@ -362,7 +362,7 @@ RemoveHouse(houseid) {
 
 CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float:EntZ, Float:EntA, Float:ExtX, Float:ExtY, Float:ExtZ, Float:ExtA, VirtualID, InteriorID, level , price) {
     new
-        string[128 + MAX_PLAYER_NAME + MAX_H_DESCRIPTION],
+        string[128 + MAX_PLAYER_NAME + MAX_HOUSE_DESCRIPTION],
         name_from_id[MAX_PLAYER_NAME]
     ;
     GetPlayerNameFromAccountID(ownerID, name_from_id);
@@ -380,37 +380,37 @@ CreateHouse(houseid, ownerID, const description[], Float:EntX, Float:EntY, Float
         level,
         price);
 
-    houseData[houseid][ENT_LABEL] = CreateDynamic3DTextLabel(string, COLOR_ORANGE, EntX, EntY, EntZ, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 25.0);
-    houseData[houseid][EXT_LABEL] = CreateDynamic3DTextLabel("House Exit", COLOR_ORANGE, ExtX, ExtY, ExtZ, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, VirtualID, InteriorID, -1, 25.0);
-    houseData[houseid][ENT_CP] = CreateDynamicCP(EntX, EntY, EntZ, 1.0, -1, -1, -1, 25.0);
-    houseData[houseid][EXT_CP] = CreateDynamicCP(ExtX, ExtY, ExtZ, 1.0, VirtualID, InteriorID, -1, 25.0);
+    houseData[houseid][E_ENT_LABEL] = CreateDynamic3DTextLabel(string, COLOR_ORANGE, EntX, EntY, EntZ, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 25.0);
+    houseData[houseid][E_EXT_LABEL] = CreateDynamic3DTextLabel("House Exit", COLOR_ORANGE, ExtX, ExtY, ExtZ, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, VirtualID, InteriorID, -1, 25.0);
+    houseData[houseid][E_ENT_CP] = CreateDynamicCP(EntX, EntY, EntZ, 1.0, -1, -1, -1, 25.0);
+    houseData[houseid][E_EXT_CP] = CreateDynamicCP(ExtX, ExtY, ExtZ, 1.0, VirtualID, InteriorID, -1, 25.0);
 
     new
         arr[2];
     arr[0] = HOUSES_STREAMER_IDENTIFIER;
     arr[1] = houseid;
 
-    Streamer_SetArrayData(STREAMER_TYPE_CP, houseData[houseid][ENT_CP], E_STREAMER_EXTRA_ID, arr);
-    Streamer_SetArrayData(STREAMER_TYPE_CP, houseData[houseid][EXT_CP], E_STREAMER_EXTRA_ID, arr);
+    Streamer_SetArrayData(STREAMER_TYPE_CP, houseData[houseid][E_ENT_CP], E_STREAMER_EXTRA_ID, arr);
+    Streamer_SetArrayData(STREAMER_TYPE_CP, houseData[houseid][E_EXT_CP], E_STREAMER_EXTRA_ID, arr);
 
-    strcpy(houseData[houseid][H_DESC], description, MAX_H_DESCRIPTION);
+    strcpy(houseData[houseid][E_HOUSE_DESC], description, MAX_HOUSE_DESCRIPTION);
 
-    houseData[houseid][H_ID]           = houseid;
-    houseData[houseid][H_OWNERID]      = ownerID;
-    houseData[houseid][H_PRICE]        = price;
-    houseData[houseid][H_LEVEL]        = level;
-    houseData[houseid][EXT_VWID]       = VirtualID;
-    houseData[houseid][EXT_INTID]      = InteriorID;
+    houseData[houseid][E_HOUSE_ID]           = houseid;
+    houseData[houseid][E_HOUSE_OWNERID]      = ownerID;
+    houseData[houseid][E_HOUSE_PRICE]        = price;
+    houseData[houseid][E_HOUSE]        = level;
+    houseData[houseid][E_HOUSE_EXT_VWID]       = VirtualID;
+    houseData[houseid][E_HOUSE_EXT_INTID]      = InteriorID;
 
-    houseData[houseid][ENT_POSX]       = EntX;
-    houseData[houseid][ENT_POSY]       = EntY;
-    houseData[houseid][ENT_POSZ]       = EntZ;
-    houseData[houseid][ENT_POSA]       = EntA;
+    houseData[houseid][E_HOUSE_ENT_X]       = EntX;
+    houseData[houseid][E_HOUSE_ENT_Y]       = EntY;
+    houseData[houseid][E_HOUSE_ENT_Z]       = EntZ;
+    houseData[houseid][E_HOUSE_ENT_A]       = EntA;
 
-    houseData[houseid][EXT_POSX]       = ExtX;
-    houseData[houseid][EXT_POSY]       = ExtY;
-    houseData[houseid][EXT_POSZ]       = ExtZ;
-    houseData[houseid][EXT_POSA]       = ExtA;
+    houseData[houseid][E_HOUSE_EXT_X]       = ExtX;
+    houseData[houseid][E_HOUSE_EXT_Y]       = ExtY;
+    houseData[houseid][E_HOUSE_EXT_Z]       = ExtZ;
+    houseData[houseid][E_HOUSE_EXT_A]       = ExtA;
 
     Iter_Add(houseIndex, houseid);
 }
@@ -421,7 +421,7 @@ GetPlayerInHouseIntID(playerid) {
     ;
 
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
-    return houseData[arr[1]][EXT_INTID];
+    return houseData[arr[1]][E_HOUSE_EXT_INTID];
 }
 
 GetPlayerInHouseVWID(playerid) {
@@ -429,7 +429,7 @@ GetPlayerInHouseVWID(playerid) {
         arr[2]
     ;
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
-    return houseData[arr[1]][EXT_VWID];
+    return houseData[arr[1]][E_HOUSE_EXT_VWID];
 }
 
 GetPlayerInHouseID(playerid) {
@@ -438,7 +438,7 @@ GetPlayerInHouseID(playerid) {
     ;
 
     Streamer_GetArrayData(STREAMER_TYPE_CP, ply_houseCheckpointID[playerid], E_STREAMER_EXTRA_ID, arr);
-    return houseData[arr[1]][H_ID];
+    return houseData[arr[1]][E_HOUSE_ID];
 }
 
 GetHouseLevelInfo(level, &price, &Float:ExtX, &Float:ExtY, &Float:ExtZ, &Float:ExtA, &vw, &intid) {

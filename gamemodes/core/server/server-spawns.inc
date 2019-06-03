@@ -17,15 +17,15 @@
 // Declarations
 enum SpawnPoint
 {
-	spawn_id,
-	Float:spawn_posX,
-	Float:spawn_posY,
-	Float:spawn_posZ,
-	Float:spawn_posA
+	E_SPAWN_ID,
+	Float:E_SPAWN_X,
+	Float:E_SPAWN_Y,
+	Float:E_SPAWN_Z,
+	Float:E_SPAWN_A
 }
 static
-	spawn_data[MAX_SPAWNPOINTS][SpawnPoint],
-	Iterator:spawn_Index<MAX_SPAWNPOINTS>,
+	spawnData[MAX_SPAWNPOINTS][SpawnPoint],
+	Iterator:spawnIndex<MAX_SPAWNPOINTS>,
 	lastSpawnID[MAX_PLAYERS] = -1;
 
 /*
@@ -53,7 +53,7 @@ hook OnGameModeInit()
 AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 {
 	new
-		id = Iter_Free(spawn_Index);
+		id = Iter_Free(spawnIndex);
 	CreateSpawnPoint(id, X, Y, Z, A);
 
     new
@@ -74,16 +74,16 @@ AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 */
 CreateSpawnPoint(ID, Float:X, Float:Y, Float:Z, Float:A)
 {
- 	if (Iter_Count(spawn_Index) == INVALID_SPAWN_ID)
+ 	if (Iter_Count(spawnIndex) == INVALID_SPAWN_ID)
  		return 0;
 
- 	spawn_data[ID][spawn_id] = ID;
-    spawn_data[ID][spawn_posX] = X;
-    spawn_data[ID][spawn_posY] = Y;
-    spawn_data[ID][spawn_posZ] = Z;
-    spawn_data[ID][spawn_posA] = A;
+ 	spawnData[ID][E_SPAWN_ID] = ID;
+    spawnData[ID][E_SPAWN_X] = X;
+    spawnData[ID][E_SPAWN_Y] = Y;
+    spawnData[ID][E_SPAWN_Z] = Z;
+    spawnData[ID][E_SPAWN_A] = A;
 
-    Iter_Add(spawn_Index, ID);
+    Iter_Add(spawnIndex, ID);
     return 1;
 }
 
@@ -98,18 +98,18 @@ RemoveSpawnPoint(spawnid)
     new
     	query[70];
 
-    if (!Iter_Contains(spawn_Index, spawnid))
+    if (!Iter_Contains(spawnIndex, spawnid))
             return 0;
 
     mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_SPAWNPOINTS" WHERE "F_SPAWN_ID" = %i", spawnid);
     mysql_tquery(GetMySQLHandle(), query);
 
-	spawn_data[spawnid][spawn_id] = -1;
-    spawn_data[spawnid][spawn_posX] =
-    spawn_data[spawnid][spawn_posY] =
-    spawn_data[spawnid][spawn_posZ] =
-    spawn_data[spawnid][spawn_posA] = 0.0;
-    Iter_Remove(spawn_Index, spawnid);
+	spawnData[spawnid][E_SPAWN_ID] = -1;
+    spawnData[spawnid][E_SPAWN_X] =
+    spawnData[spawnid][E_SPAWN_Y] =
+    spawnData[spawnid][E_SPAWN_Z] =
+    spawnData[spawnid][E_SPAWN_A] = 0.0;
+    Iter_Remove(spawnIndex, spawnid);
     return 1;
 }
 
@@ -168,14 +168,14 @@ LoadSpawns()
 */
 SpawnPlayerToSpawnPoint(playerid) {
 
-	new ranspawn_ID = Iter_Random(spawn_Index);
+	new ranspawn_ID = Iter_Random(spawnIndex);
 
 	if (lastSpawnID[playerid] == ranspawn_ID) {
         return SpawnPlayerToSpawnPoint(playerid);
     }
 
-	SetPlayerPos(playerid, spawn_data[ranspawn_ID][spawn_posX], spawn_data[ranspawn_ID][spawn_posY], spawn_data[ranspawn_ID][spawn_posZ]);
-	SetPlayerFacingAngle(playerid, spawn_data[ranspawn_ID][spawn_posA]);
+	SetPlayerPos(playerid, spawnData[ranspawn_ID][E_SPAWN_X], spawnData[ranspawn_ID][E_SPAWN_Y], spawnData[ranspawn_ID][E_SPAWN_Z]);
+	SetPlayerFacingAngle(playerid, spawnData[ranspawn_ID][E_SPAWN_A]);
 	SetCameraBehindPlayer(playerid);
 	lastSpawnID[playerid] = ranspawn_ID;
     return 1;
@@ -193,11 +193,11 @@ ListSpawnPoint(playerid)
 		tmp_string[128],
 		string[512];
 
-	foreach(new i : spawn_Index) {
-		format(tmp_string, sizeof(tmp_string), "ID: %i - X: %0.2f - Y: %0.2f - Z: %0.2f - A: %0.2f\n", spawn_data[i][spawn_id], spawn_data[i][spawn_posX], spawn_data[i][spawn_posY], spawn_data[i][spawn_posZ], spawn_data[i][spawn_posA]);
+	foreach(new i : spawnIndex) {
+		format(tmp_string, sizeof(tmp_string), "ID: %i - X: %0.2f - Y: %0.2f - Z: %0.2f - A: %0.2f\n", spawnData[i][E_SPAWN_ID], spawnData[i][E_SPAWN_X], spawnData[i][E_SPAWN_Y], spawnData[i][E_SPAWN_Z], spawnData[i][E_SPAWN_A]);
 		strcat(string, tmp_string, sizeof(string));
 	}
-	if (Iter_Count(spawn_Index)) {
+	if (Iter_Count(spawnIndex)) {
 		Dialog_Show( playerid, DIALOG_STYLE_LIST, " Spawn Points", string, "Close", "" );
 	} else {
 		Dialog_Show( playerid, DIALOG_STYLE_LIST, " Spawn Points", "There are no  Spawn created, create one to let players spawn.", "Close", "" );
@@ -212,7 +212,7 @@ ListSpawnPoint(playerid)
 		Check if spawn point is valid
 */
 IsValidSpawnPoint(spawnid) {
-	return Iter_Contains(spawn_Index, spawnid);
+	return Iter_Contains(spawnIndex, spawnid);
 }
 
 /*
@@ -222,7 +222,7 @@ IsValidSpawnPoint(spawnid) {
 		Returns the total amount of spawn point created
 */
 CountSpawnPoint() {
-	return Iter_Count(spawn_Index);
+	return Iter_Count(spawnIndex);
 }
 
 /*
@@ -237,7 +237,7 @@ SendPlayerToSpawnPoint(playerid, spawnid) {
 		return 0;
 	}
 
-	SetPlayerPos(playerid, spawn_data[spawnid][spawn_posX], spawn_data[spawnid][spawn_posY], spawn_data[spawnid][spawn_posZ]);
-	SetPlayerFacingAngle(playerid, spawn_data[spawnid][spawn_posA]);
+	SetPlayerPos(playerid, spawnData[spawnid][E_SPAWN_X], spawnData[spawnid][E_SPAWN_Y], spawnData[spawnid][E_SPAWN_Z]);
+	SetPlayerFacingAngle(playerid, spawnData[spawnid][E_SPAWN_A]);
 	return 1;
 }
