@@ -98,12 +98,3 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid) {
     }
     return 1;
 }
-
-hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys) {
-
-    if(PRESSED(KEY_SECONDARY_ATTACK)) {
-        cmd_house(playerid, "enter");
-        cmd_house(playerid, "exit");
-    }
-    return 1;
-}

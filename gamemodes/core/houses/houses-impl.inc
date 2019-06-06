@@ -1,10 +1,10 @@
 
 #define TABLE_HOUSE             "houses"
-#define FIELD_HOUSE_ID          "E_hOUSE_ID"
+#define FIELD_HOUSE_ID          "h_ID"
 #define FIELD_HOUSE_INTERIOR    "h_fk_intID"
-#define FIELD_HOUSE_OWNERID     "E_hOUSE_ownerID"
-#define FIELD_HOUSE_DESCRIPTION "E_hOUSE_description"
-#define FIELD_HOUSE_PRICE       "E_hOUSE_price"
+#define FIELD_HOUSE_OWNERID     "h_ownerID"
+#define FIELD_HOUSE_DESCRIPTION "h_description"
+#define FIELD_HOUSE_PRICE       "h_price"
 #define FIELD_HOUSE_CASH_STORED "h_cashstored"
 #define FIELD_HOUSE_ENT_X       "h_entX"
 #define FIELD_HOUSE_ENT_Y       "h_entY"
@@ -264,8 +264,7 @@ LoadHouses() {
 UpdateHouse(houseid, newownerID, const newdescription[])
 {
     new
-        string[128 + MAX_PLAYER_NAME + MAX_HOUSE_DESCRIPTION]
-    ;
+        string[128 + MAX_PLAYER_NAME + MAX_HOUSE_DESCRIPTION];
 
     if (houseid == INVALID_HOUSE_ID) {
         return 0;

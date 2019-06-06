@@ -17,7 +17,7 @@ CMD:house(playerid, const params[])
         count;
 
     if (isnull(params))
-        return SendSyntaxMsg(playerid, "/house buy | enter | exit | description | upgrade");
+        return SendSyntaxMsg(playerid, "/house buy | enter | exit | description | furniture");
 
     if (i == INVALID_HOUSE_ID)
             return SendErrorMsg(playerid, "Invalid house id, you have not entered any house checkpoint.");

@@ -1,47 +1,129 @@
 // Dependencies
+#include <a_mysql>
 #include <YSI_Visual\y_dialog>
 #include <YSI_Coding\y_hooks>
-#include <YSI_Data\y_iterate>
 
-// Definitions
-#define MAX_SPAWNPOINTS (10)
-#define INVALID_SPAWN_ID (-1)
+#define YSI_MALLOC_SECURE
+#include <YSI_Coding\y_malloc>
 
-#define T_SPAWNPOINTS 		"Spawns"
-#define F_SPAWN_ID 			"SpawnID"
-#define F_SPAWN_POS_X 		"SpawnX"
-#define F_SPAWN_POS_Y 		"SpawnY"
-#define F_SPAWN_POS_Z 		"SpawnZ"
-#define F_SPAWN_POS_A 		"SpawnA"
+
+// Table and Fields Constants
+#define TABLE_SPAWNPOINTS 		"Spawns"
+#define FIELD_SPAWN_ID 			"SpawnID"
+#define FIELD_SPAWN_POS_X 		"SpawnX"
+#define FIELD_SPAWN_POS_Y 		"SpawnY"
+#define FIELD_SPAWN_POS_Z 		"SpawnZ"
+#define FIELD_SPAWN_POS_A 		"SpawnA"
+
+// constant
+const
+	INVALID_SPAWN_ID = -1;
+
+new
+    MAX_SPAWNPOINTS = 0;
 
 // Declarations
-enum SpawnPoint
+static enum e_SPAWN_DATA
 {
-	E_SPAWN_ID,
-	Float:E_SPAWN_X,
-	Float:E_SPAWN_Y,
-	Float:E_SPAWN_Z,
-	Float:E_SPAWN_A
+	Alloc: e_SPAWN_ID,
+	Alloc: e_SPAWN_X, // should be Float:
+	Alloc: e_SPAWN_Y, // should be Float:
+	Alloc: e_SPAWN_Z, // should be Float:
+	Alloc: e_SPAWN_A, // should be Float:
+	Alloc: e_SPAWN_CREATED // should be bool:
 }
 static
-	spawnData[MAX_SPAWNPOINTS][SpawnPoint],
-	Iterator:spawnIndex<MAX_SPAWNPOINTS>,
-	lastSpawnID[MAX_PLAYERS] = -1;
+	spawn_Data[e_SPAWN_DATA],
+	spawn_Count = 0, // start from 0
+	lastSpawnID[MAX_PLAYERS] = INVALID_SPAWN_ID;
 
-/*
-	Hook
-		-> Create the table in our database if it doesn't exist.
-*/
 hook OnGameModeInit()
 {
-	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "T_SPAWNPOINTS" (\
-		"F_SPAWN_ID" TINYINT(3) NOT NULL DEFAULT 0,\
-		"F_SPAWN_POS_X" FLOAT NOT NULL,\
-		"F_SPAWN_POS_Y" FLOAT NOT NULL,\
-		"F_SPAWN_POS_Z" FLOAT NOT NULL,\
-		"F_SPAWN_POS_A"	FLOAT NOT NULL)");
-
+	// Create the table in our database if it doesn't exist.
+	mysql_tquery(GetMySQLHandle(), "CREATE TABLE IF NOT EXISTS "TABLE_SPAWNPOINTS" (\
+		"FIELD_SPAWN_ID" TINYINT(3) NOT NULL DEFAULT 0,\
+		"FIELD_SPAWN_POS_X" FLOAT NOT NULL,\
+		"FIELD_SPAWN_POS_Y" FLOAT NOT NULL,\
+		"FIELD_SPAWN_POS_Z" FLOAT NOT NULL,\
+		"FIELD_SPAWN_POS_A"	FLOAT NOT NULL)");
 	LoadSpawns();
+}
+
+
+hook OnPlayerConnect(playerid) {
+	// set letSpawnID[playerid] to INVALID_SPAWN_ID just to init the variable back to default.
+	lastSpawnID[playerid] = INVALID_SPAWN_ID;
+
+
+	AllocateSpawnMemory();
+}
+
+AllocateSpawnMemory() {
+
+	// called on fresh start.
+	if (MAX_SPAWNPOINTS == 0)
+    {
+		MAX_SPAWNPOINTS = 15;
+        spawn_Data[e_SPAWN_ID]      = calloc(MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_X]       = calloc(MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_Y]       = calloc(MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_Z]       = calloc(MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_A]       = calloc(MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_CREATED] = calloc(MAX_SPAWNPOINTS);
+    }
+    else
+    {
+		MAX_SPAWNPOINTS *= 2;
+        spawn_Data[e_SPAWN_ID]      = realloc(spawn_Data[e_SPAWN_ID], MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_X]       = realloc(spawn_Data[e_SPAWN_X], MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_Y]       = realloc(spawn_Data[e_SPAWN_Y], MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_Z]       = realloc(spawn_Data[e_SPAWN_Z], MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_A]       = realloc(spawn_Data[e_SPAWN_A], MAX_SPAWNPOINTS);
+        spawn_Data[e_SPAWN_CREATED] = realloc(spawn_Data[e_SPAWN_CREATED], MAX_SPAWNPOINTS);
+    }
+
+    // Go up to the internal limit - may as well.
+    MAX_SPAWNPOINTS = Malloc_SlotSize(spawn_Data[e_SPAWN_CREATED]);
+	return MAX_SPAWNPOINTS;
+}
+
+/*
+	Function:
+		CountSpawnPoint()
+	Information:
+		Returns the total amount of spawn point created
+*/
+CountSpawnPoint() {
+	return spawn_Count;
+}
+
+/*
+	Function:
+		IsValidSpawnPoint(spawnid)
+	Information:
+		Check if spawn point is valid
+*/
+bool:IsValidSpawnPoint(spawnid) {
+	return bool:mget(spawn_Data[e_SPAWN_CREATED], spawnid);
+}
+
+/*
+	Function:
+		GetSpawnNextSlot()
+	Information:
+		Retrieves the unused slot.
+*/
+GetSpawnFreeID() {
+	// loop through all the valid spawnpoint
+	for(new i = 0, j = MAX_SPAWNPOINTS; i < j; i++) {
+		// next invalid ID = free slot.
+		if(!IsValidSpawnPoint(i)) {
+			// return the slot found.
+			return i;
+		}
+	}
+	// if no valid spawn point found we return INVALID_SPAWN_ID
+	return INVALID_SPAWN_ID;
 }
 
 /*
@@ -53,16 +135,24 @@ hook OnGameModeInit()
 AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 {
 	new
-		id = Iter_Free(spawnIndex);
+		id = GetSpawnFreeID();
+
+	if(id == INVALID_SPAWN_ID) {
+		new
+			size = AllocateSpawnMemory();
+		printf("ERROR: No more slots left, allocating more slot to MAX_SPAWNPOINTS, new size: %i", size);
+		return;
+	}
+
+	id = GetSpawnFreeID();
 	CreateSpawnPoint(id, X, Y, Z, A);
 
     new
     	query[128];
-   	mysql_format(GetMySQLHandle(), query, sizeof(query), "INSERT INTO "T_SPAWNPOINTS" \
-   		("F_SPAWN_ID", "F_SPAWN_POS_X", "F_SPAWN_POS_Y", "F_SPAWN_POS_Z", "F_SPAWN_POS_A") \
+   	mysql_format(GetMySQLHandle(), query, sizeof(query), "INSERT INTO "TABLE_SPAWNPOINTS" \
+   		("FIELD_SPAWN_ID", "FIELD_SPAWN_POS_X", "FIELD_SPAWN_POS_Y", "FIELD_SPAWN_POS_Z", "FIELD_SPAWN_POS_A") \
    		VALUES (%i, %0.2f, %0.2f, %0.2f, %0.2f)", id, X, Y, Z, A);
  	mysql_tquery(GetMySQLHandle(), query, "", "");
-    return 1;
 }
 
 /*
@@ -72,19 +162,15 @@ AddSpawnPoint(Float:X, Float:Y, Float:Z, Float:A)
 		Create spawnpoint on specified coordinates, this function should only be used under AddSpawnPoint,
 		if you want to create a new spawnpoint and save it to database function AddSpawnPoint should be used.
 */
-CreateSpawnPoint(ID, Float:X, Float:Y, Float:Z, Float:A)
+CreateSpawnPoint(spawnid, Float:X, Float:Y, Float:Z, Float:A)
 {
- 	if (Iter_Count(spawnIndex) == INVALID_SPAWN_ID)
- 		return 0;
-
- 	spawnData[ID][E_SPAWN_ID] = ID;
-    spawnData[ID][E_SPAWN_X] = X;
-    spawnData[ID][E_SPAWN_Y] = Y;
-    spawnData[ID][E_SPAWN_Z] = Z;
-    spawnData[ID][E_SPAWN_A] = A;
-
-    Iter_Add(spawnIndex, ID);
-    return 1;
+	mset(spawn_Data[e_SPAWN_ID], spawnid, spawnid);
+	mset(spawn_Data[e_SPAWN_X], spawnid, _:X);
+	mset(spawn_Data[e_SPAWN_Y], spawnid, _:Y);
+	mset(spawn_Data[e_SPAWN_Z], spawnid, _:Z);
+	mset(spawn_Data[e_SPAWN_A], spawnid, _:A);
+	mset(spawn_Data[e_SPAWN_CREATED], spawnid, bool:true);
+	return spawn_Count ++;
 }
 
 /*
@@ -98,19 +184,21 @@ RemoveSpawnPoint(spawnid)
     new
     	query[70];
 
-    if (!Iter_Contains(spawnIndex, spawnid))
-            return 0;
+    if (!IsValidSpawnPoint(spawnid))
+            return INVALID_SPAWN_ID;
 
-    mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "T_SPAWNPOINTS" WHERE "F_SPAWN_ID" = %i", spawnid);
+	// execute DELETE statement
+    mysql_format(GetMySQLHandle(), query, sizeof(query), "DELETE FROM "TABLE_SPAWNPOINTS" WHERE "FIELD_SPAWN_ID" = %i", spawnid);
     mysql_tquery(GetMySQLHandle(), query);
 
-	spawnData[spawnid][E_SPAWN_ID] = -1;
-    spawnData[spawnid][E_SPAWN_X] =
-    spawnData[spawnid][E_SPAWN_Y] =
-    spawnData[spawnid][E_SPAWN_Z] =
-    spawnData[spawnid][E_SPAWN_A] = 0.0;
-    Iter_Remove(spawnIndex, spawnid);
-    return 1;
+	// set the value to invalid
+	mset(spawn_Data[e_SPAWN_ID], spawnid, INVALID_SPAWN_ID);
+	mset(spawn_Data[e_SPAWN_X], spawnid, _:0.0);
+	mset(spawn_Data[e_SPAWN_Y], spawnid, _:0.0);
+	mset(spawn_Data[e_SPAWN_Z], spawnid, _:0.0);
+	mset(spawn_Data[e_SPAWN_A], spawnid, _:0.0);
+	mset(spawn_Data[e_SPAWN_CREATED], spawnid, bool:false);
+    return spawn_Count --;
 }
 
 /*
@@ -128,18 +216,21 @@ LoadSpawns()
 			Float:_spawnX,
 			Float:_spawnY,
 			Float:_spawnZ,
-			Float:_spawnAng
+			Float:_spawnAng,
+			rows
 		;
 
-		if (cache_num_rows()) {
-			for(new i = 0; i < cache_num_rows(); ++i) {
-				cache_get_value_name_int 	(i, F_SPAWN_ID, 	_spawnID);
-				cache_get_value_name_float 	(i, F_SPAWN_POS_X, 	_spawnX);
-				cache_get_value_name_float 	(i, F_SPAWN_POS_Y, 	_spawnY);
-				cache_get_value_name_float 	(i, F_SPAWN_POS_Z, 	_spawnZ);
-				cache_get_value_name_float 	(i, F_SPAWN_POS_A, 	_spawnAng);
+		cache_get_row_count(rows);
+		if (rows) {
+			for(new i = 0; i < rows; ++i) {
+				cache_get_value_name_int 	(i, FIELD_SPAWN_ID, 	_spawnID);
+				cache_get_value_name_float 	(i, FIELD_SPAWN_POS_X, 	_spawnX);
+				cache_get_value_name_float 	(i, FIELD_SPAWN_POS_Y, 	_spawnY);
+				cache_get_value_name_float 	(i, FIELD_SPAWN_POS_Z, 	_spawnZ);
+				cache_get_value_name_float 	(i, FIELD_SPAWN_POS_A, 	_spawnAng);
 				CreateSpawnPoint(_spawnID, _spawnX, _spawnY, _spawnZ, _spawnAng);
 			}
+		// if no rows to load from the database, we create 10 default spawn to avoid player from spawning in blueberry farms.
 		} else {
 			AddSpawnPoint(-1935.0742, 678.1586, 46.5625, 356.4240 );
 			AddSpawnPoint(-1922.5177, 680.0504, 46.5625, 2.6907   );
@@ -156,7 +247,7 @@ LoadSpawns()
 	MySQL_TQueryInline(
 		GetMySQLHandle(),
 		using inline OnLoadSpawnPoint,
-		"SELECT * FROM  "T_SPAWNPOINTS""
+		"SELECT * FROM  "TABLE_SPAWNPOINTS""
 	);
 }
 
@@ -168,16 +259,21 @@ LoadSpawns()
 */
 SpawnPlayerToSpawnPoint(playerid) {
 
-	new ranspawn_ID = Iter_Random(spawnIndex);
+	new spawnid = random(CountSpawnPoint());
 
-	if (lastSpawnID[playerid] == ranspawn_ID) {
+	if (lastSpawnID[playerid] == spawnid) {
         return SpawnPlayerToSpawnPoint(playerid);
     }
 
-	SetPlayerPos(playerid, spawnData[ranspawn_ID][E_SPAWN_X], spawnData[ranspawn_ID][E_SPAWN_Y], spawnData[ranspawn_ID][E_SPAWN_Z]);
-	SetPlayerFacingAngle(playerid, spawnData[ranspawn_ID][E_SPAWN_A]);
+
+	SetPlayerPos(playerid,
+		Float:mget(spawn_Data[e_SPAWN_X], spawnid),
+		Float:mget(spawn_Data[e_SPAWN_Y], spawnid),
+		Float:mget(spawn_Data[e_SPAWN_Z], spawnid)
+	);
+	SetPlayerFacingAngle(playerid, Float:mget(spawn_Data[e_SPAWN_A], spawnid));
 	SetCameraBehindPlayer(playerid);
-	lastSpawnID[playerid] = ranspawn_ID;
+	lastSpawnID[playerid] = spawnid;
     return 1;
 }
 
@@ -193,36 +289,22 @@ ListSpawnPoint(playerid)
 		tmp_string[128],
 		string[512];
 
-	foreach(new i : spawnIndex) {
-		format(tmp_string, sizeof(tmp_string), "ID: %i - X: %0.2f - Y: %0.2f - Z: %0.2f - A: %0.2f\n", spawnData[i][E_SPAWN_ID], spawnData[i][E_SPAWN_X], spawnData[i][E_SPAWN_Y], spawnData[i][E_SPAWN_Z], spawnData[i][E_SPAWN_A]);
+	for (new i = 0, j = CountSpawnPoint(); i < j; i++) {
+		format(tmp_string, sizeof(tmp_string), "ID: %i - X: %0.2f - Y: %0.2f - Z: %0.2f - A: %0.2f\n",
+			mget(spawn_Data[e_SPAWN_ID], i),
+			Float:mget(spawn_Data[e_SPAWN_X], i),
+			Float:mget(spawn_Data[e_SPAWN_Y], i),
+			Float:mget(spawn_Data[e_SPAWN_Z], i),
+			Float:mget(spawn_Data[e_SPAWN_A], i)
+		);
 		strcat(string, tmp_string, sizeof(string));
 	}
-	if (Iter_Count(spawnIndex)) {
-		Dialog_Show( playerid, DIALOG_STYLE_LIST, " Spawn Points", string, "Close", "" );
+	if (CountSpawnPoint()) {
+		Dialog_Show(playerid, DIALOG_STYLE_LIST, " Spawn Points", string, "Close", "" );
 	} else {
-		Dialog_Show( playerid, DIALOG_STYLE_LIST, " Spawn Points", "There are no  Spawn created, create one to let players spawn.", "Close", "" );
+		Dialog_Show(playerid, DIALOG_STYLE_LIST, " Spawn Points", "There are no  Spawn created, create one to let players spawn.", "Close", "");
 	}
 	return 1;
-}
-
-/*
-	Function:
-		IsValidSpawnPoint(playerid)
-	Information:
-		Check if spawn point is valid
-*/
-IsValidSpawnPoint(spawnid) {
-	return Iter_Contains(spawnIndex, spawnid);
-}
-
-/*
-	Function:
-		CountSpawnPoint(playerid)
-	Information:
-		Returns the total amount of spawn point created
-*/
-CountSpawnPoint() {
-	return Iter_Count(spawnIndex);
 }
 
 /*
@@ -237,7 +319,12 @@ SendPlayerToSpawnPoint(playerid, spawnid) {
 		return 0;
 	}
 
-	SetPlayerPos(playerid, spawnData[spawnid][E_SPAWN_X], spawnData[spawnid][E_SPAWN_Y], spawnData[spawnid][E_SPAWN_Z]);
-	SetPlayerFacingAngle(playerid, spawnData[spawnid][E_SPAWN_A]);
+	SetPlayerPos(playerid,
+		Float:mget(spawn_Data[e_SPAWN_X], spawnid),
+		Float:mget(spawn_Data[e_SPAWN_Y], spawnid),
+		Float:mget(spawn_Data[e_SPAWN_Z], spawnid)
+	);
+	SetPlayerFacingAngle(playerid, Float:mget(spawn_Data[e_SPAWN_A], spawnid));
+	SetCameraBehindPlayer(playerid);
 	return 1;
 }

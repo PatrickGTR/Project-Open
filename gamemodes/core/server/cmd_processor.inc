@@ -7,9 +7,11 @@
 #define CMD:%1(%2) forward cmd_%1(%2); public cmd_%1(%2)
 
 // ADMIN
+// Example: ACMD:[3]ban(playerid, params[]) -> this creates a command for level 3 admins
 #define ACMD:[%0]%1(%2,%3) CMD:%1(%2,%3) if (GetPlayerAdminLevel(%2) < %0) return 0; else
 
 // VIP
+// Example: VCMD:[5]heal(playerid, params[]) -> this creates a command for level 5 vips
 #define VCMD:[%0]%1(%2,%3) CMD:%1(%2,%3) if (GetPlayerVIPLevel(%2) < %0) return 0; else
 
 #if defined OnPlayerCommandReceived

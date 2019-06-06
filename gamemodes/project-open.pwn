@@ -5,7 +5,7 @@
         Southclaw  - I took a lot of snippets from S&S to make productivity quicker.
         Zeex       - Crashdetect.
         Y_Less     - YSI, sscanf.
-        maddinat0r - MySQL, helped me with an issue in house system.
+        maddinat0r - MySQL.
         Slice      - strlib, formatex.
 */
 
@@ -20,7 +20,7 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 #define SV_NAME 			        "Project Open"
 #define SV_CURRENT_BUILD	        "1.0"
 
-#define MAX_PLAYERS             	(32)
+#define MAX_PLAYERS             	(50)
 #define MAX_VEHICLES                (1000)
 #define MAX_HOUSES                  (100)
 
@@ -91,3 +91,4 @@ CMD:money(playerid, params[])
     GivePlayerMoney(playerid, 99999999);
     return 1;
 }
+

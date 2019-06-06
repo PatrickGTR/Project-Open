@@ -99,10 +99,12 @@ CreateFurniture(furnitureID, houseID, objectID, Float:x, Float:y, Float:z, Float
 	return Streamer_SetArrayData(STREAMER_TYPE_OBJECT, tmp_objectid, E_STREAMER_EXTRA_ID, arr);
 }
 
-DeleteFurniture(houseID, furnitureID) {
+DeleteFurniture(objectid, houseid, furnitureid) {
+
+	Streamer_RemoveArrayData(STREAMER_TYPE_OBJECT, objectid, E_STREAMER_EXTRA_ID, houseid);
 	mysql_tquery(GetMySQLHandle(),
-		sprintf("DELETE FROM "TABLE_FURNITURE" WHERE "FIELD_FURNITURE_INDEXID" = %i AND "FIELD_FURNITURE_HOUSEID" = %i", furnitureID, houseID));
-	return furnitureID;
+		sprintf("DELETE FROM "TABLE_FURNITURE" WHERE "FIELD_FURNITURE_INDEXID" = %i AND "FIELD_FURNITURE_HOUSEID" = %i", furnitureid, houseid));
+	return furnitureid;
 }
 
 DeleteTemporaryFurniture(playerid) {

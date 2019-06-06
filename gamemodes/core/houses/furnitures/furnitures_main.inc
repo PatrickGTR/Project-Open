@@ -243,12 +243,15 @@ hook OnPlayerSelectDynObj(playerid, objectid, modelid, Float:x, Float:y, Float:z
     if(IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_EDITING_FURNITURE) {
         EditDynamicObject(playerid, objectid);
     }
-    else if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_DELETING_FURNITURE) {
+
+    if (IsPlayerOnFurnitureMode(playerid) && GetPlayerFurnitureEditingType(playerid) == TYPE_DELETING_FURNITURE) {
 
         inline ConfirmFurnitureDeletion(pid, dialogid, response, listitem, string:inputtext[]) {
             #pragma unused pid, listitem, dialogid, inputtext
-            if(!response)
-                return ShowPlayerFurnitureDialog(playerid);
+            if(!response) {
+                SendServerMsg(playerid, "Furniture Deletion cancelled.");
+                return CancelEdit(playerid);
+            }
 
             SetPlayerFurnitureEditingType(playerid, INVALID_EDITING_TYPE);
             SetPlayerFurnitureMode(playerid, false);
@@ -261,9 +264,10 @@ hook OnPlayerSelectDynObj(playerid, objectid, modelid, Float:x, Float:y, Float:z
                 second cell -> furniture index ID
             */
             Streamer_GetArrayData(STREAMER_TYPE_OBJECT, objectid, E_STREAMER_EXTRA_ID, arr);
-            DeleteFurniture(arr[0], arr[1]);
+            DeleteFurniture(objectid, arr[0], arr[1]);
 
             DestroyDynamicObject(objectid);
+            CancelEdit(playerid);
         }
 
         Dialog_ShowCallback(playerid, using inline ConfirmFurnitureDeletion, DIALOG_STYLE_MSGBOX,

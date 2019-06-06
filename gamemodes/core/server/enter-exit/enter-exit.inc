@@ -84,7 +84,7 @@ hook OnGameModeInit() {
         SetEntranceName(entid, storeData[i][E_STORE_NAME]);
 
         CreateActorRobbery(sprintf("%s\n[AIM TO ROB]", storeData[i][E_STORE_NAME]), storeData[i][E_ACTOR_SKINID], storeData[i][E_STORE_ACTOR][0],  storeData[i][E_STORE_ACTOR][1], storeData[i][E_STORE_ACTOR][2]+1.2, storeData[i][E_STORE_ACTOR][3], i);
-	}
+    }
 
 
     new
