@@ -73,6 +73,10 @@ CreateAccount(playerid, const password[])
     new
         playerName[MAX_PLAYER_NAME];
     GetPlayerName(playerid, playerName, sizeof(playerName));
-    MySQL_TQueryInline(GetMySQLHandle(), using inline OnPlayerRegister, "INSERT INTO accounts ("FIELD_USERNAME", "FIELD_PASSWORD", "FIELD_SALT", "FIELD_REG_DATE") VALUES ('%e', '%e', '%e', CURRENT_TIMESTAMP())", playerName, playerPassword, salt);
+
+    MySQL_Bind(stmt_insertPlayerAccount, 0, playerName);
+    MySQL_Bind(stmt_insertPlayerAccount, 1, playerPassword);
+    MySQL_Bind(stmt_insertPlayerAccount, 2, salt);
+    MySQL_ExecuteThreaded_Inline(stmt_insertPlayerAccount, using inline OnPlayerRegister);
     return 1;
 }

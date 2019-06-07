@@ -12,7 +12,8 @@
 		"maddinat0r/sscanf",
 		"Southclaws/progress2",
 		"Zeex/samp-plugin-crashdetect",
-		"samp-incognito/samp-streamer-plugin"
+		"samp-incognito/samp-streamer-plugin",
+		"https://github.com/PatrickGTR/MySQL-Prepared-Statements"
 	],
 	"local": true,
 	"builds": [

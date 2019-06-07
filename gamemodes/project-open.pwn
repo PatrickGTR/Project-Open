@@ -34,10 +34,11 @@ native gpci(playerid, buffer[], size = sizeof(buffer));
 
 #define STRLIB_RETURN_SIZE          (256) //re-defined for MySQL queries.
 
-#define SQL_DATETIME_FORMAT         "%%d, %%M, %%Y at %%r"
-#define SQL_DATE_FORMAT             "%%d %%M %%Y"
+#define SQL_DATETIME_FORMAT         "%d, %M, %%Y at %r"
+#define SQL_DATE_FORMAT             "%d %M %Y"
 
 #define KEY_AIM 128
+
 
 // Macros
 #define PRESSED(%0) (((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))
@@ -66,8 +67,47 @@ enum {
     TYPE_MECHANIC
 }
 
+
 #include <utils>
 #include <server>
+
+#include <a_mysqL>
+
+#define MAX_STATEMENTS (100)
+#include <mysql_prepared>
+new
+    Statement: stmt_checkPlayerAccount,
+    Statement: stmt_loadPlayerAccount,
+
+    Statement: stmt_insertPlayerAccount,
+
+    Statement: stmt_updateLastLogin,
+    Statement: stmt_updateScore,
+    Statement: stmt_updateExperience,
+    Statement: stmt_updateJob,
+
+    Statement: stmt_selectDeleteAccount,
+    Statement: stmt_deleteAccount;
+
+#include <YSI_Coding\y_hooks>
+hook OnGameModeInit() {
+
+    stmt_checkPlayerAccount = MySQL_PrepareStatement(GetMySQLHandle(), "SELECT accountID, password, salt FROM accounts WHERE username = ? LIMIT 1");
+    stmt_loadPlayerAccount = MySQL_PrepareStatement(GetMySQLHandle(), "SELECT money, kills, deaths, jobID, score, experience, wantedlevel, \
+    DATE_FORMAT(registerdate, '"SQL_DATE_FORMAT"'), DATE_FORMAT(lastlogin, '"SQL_DATETIME_FORMAT"') FROM accounts WHERE accountID = ? LIMIT 1");
+
+    stmt_updateLastLogin = MySQL_PrepareStatement(GetMySQLHandle(), "UPDATE accounts SET lastlogin = CURRENT_TIMESTAMP() WHERE accountID = ?");
+
+    stmt_selectDeleteAccount = MySQL_PrepareStatement(GetMySQLHandle(), "SELECT accountID FROM accounts WHERE username = ? LIMIT 1");
+    stmt_deleteAccount = MySQL_PrepareStatement(GetMySQLHandle(), "DELETE FROM accounts WHERE accountID = ?");
+
+    stmt_insertPlayerAccount = MySQL_PrepareStatement(GetMySQLHandle(), "INSERT INTO accounts (username, password, salt, registerdate) VALUES (?, ?, ?, CURRENT_TIMESTAMP())");
+    stmt_updateScore = MySQL_PrepareStatement(GetMySQLHandle(), "UPDATE accounts SET score = ? WHERE accountID = ?");
+    stmt_updateExperience = MySQL_PrepareStatement(GetMySQLHandle(), "UPDATE accounts SET experience = ? WHERE accountID = ?");
+    stmt_updateJob = MySQL_PrepareStatement(GetMySQLHandle(), "UPDATE accounts SET jobID = ? WHERE accountID = ?");
+    return 1;
+}
+
 #include <ui>
 #include <account>
 #include <features>
@@ -84,6 +124,7 @@ main () {
 	LoadStaticVehiclesFromFile("vehicles/sf_gen.txt");
 	LoadStaticVehiclesFromFile("vehicles/whetstone.txt");
 	LoadStaticVehiclesFromFile("vehicles/bone.txt");
+
 }
 
 CMD:money(playerid, params[])

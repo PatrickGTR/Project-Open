@@ -4,7 +4,7 @@
 
 #define ROBBERY_STREAMER_IDENTIFIER (200)
 
-static Float:bankRobberyPoints[8][3] = {
+static const Float:bankRobberyPoints[8][3] = {
 	{1437.8900, -978.1204, 983.5342},
 	{1437.8900, -974.1539, 983.5342},
 	{1437.8900, -970.2146, 983.5342},
@@ -18,8 +18,8 @@ static Float:bankRobberyPoints[8][3] = {
 
 static
 	bankRobberyPickup[8],
-	Text3D:bankRobberyLabel[8],
-	bool:safeHasBeenRobbed[8],
+	Text3D:bankRobberyLabel[sizeof(bankRobberyPoints)],
+	bool:safeHasBeenRobbed[sizeof(bankRobberyPoints)],
 	plySafeID[MAX_PLAYERS],
 	gBankSafe,
 	isBankDoorBreached

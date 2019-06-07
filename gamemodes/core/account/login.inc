@@ -1,26 +1,26 @@
 DeleteAccount(playerid, const username[])
 {
     inline const OnDeleteAccount() {
-        if (!cache_num_rows()) {
+
+        new
+            accountid;
+
+        MySQL_BindResultInt(stmt_selectDeleteAccount, 0, accountid);
+
+        if(MySQL_Statement_FetchRow(stmt_selectDeleteAccount)) {
+            MySQL_BindInt(stmt_deleteAccount, 0, accountid);
+            MySQL_ExecuteParallel(stmt_deleteAccount);
+
+            SendServerMsgF(playerid, "The account "C_GREY"(Name: '%s' - accountID: %i) has been successfully deleted!", username, accountid);
+        } else {
             SendErrorMsgF(playerid, "The account "C_GREY"('%s') "C_WHITE"you are trying to delete does not exist in the database", username);
             return 0;
-        } else {
-            new
-                acc_id;
-
-            cache_get_value_name_int(0, FIELD_ACCOUNTID, acc_id);
-
-            mysql_tquery(GetMySQLHandle(), sprintf("DELETE FROM "TABLE_ACCOUNT" WHERE "FIELD_ACCOUNTID" = %i", acc_id));
-
-            SendServerMsgF(playerid, "The account "C_GREY"(Nane: '%s' - accountID: %i) has been successfully deleted!", username, acc_id);
         }
         return 1;
     }
-    MySQL_TQueryInline(
-        GetMySQLHandle(),
-        using inline OnDeleteAccount,
-        "SELECT "FIELD_USERNAME", "FIELD_ACCOUNTID" FROM "TABLE_ACCOUNT" WHERE "FIELD_USERNAME" = '%e' LIMIT 1", username
-    );
+
+    MySQL_Bind(stmt_selectDeleteAccount, 0, username);
+    MySQL_ExecuteThreaded_Inline(stmt_selectDeleteAccount, using inline OnDeleteAccount);
     return 1;
 }
 
@@ -71,7 +71,7 @@ GetPlayerNameFromAccountID(accountid, plyName[MAX_PLAYER_NAME])
     new
         qString[64];
 
-    mysql_format(GetMySQLHandle(), qString, sizeof(qString), "SELECT "FIELD_USERNAME" FROM "TABLE_ACCOUNT" WHERE "FIELD_ACCOUNTID" = %i", accountid);
+    mysql_format(GetMySQLHandle(), qString, sizeof(qString), "SELECT username FROM accounts WHERE accountID = %i", accountid);
     new Cache: res = mysql_query(GetMySQLHandle(), qString, true);
 
     new
