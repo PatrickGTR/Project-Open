@@ -90,16 +90,12 @@ hook OnPlayerConnect(playerid) {
             new
                 playerSalt[MAX_HASH],
                 playerPassword[MAX_PASSWORD];
-            // retrieve accountid, salt and password from database.
-            // store accountID to playerAccountID
-            // store salt to playerSalt
-            // store password to playerPassword
+
             cache_get_value_name_int(0, FIELD_ACCOUNTID, playerAccountID[playerid]);
             cache_get_value_name(0, FIELD_SALT, playerSalt, MAX_HASH);
             cache_get_value_name(0, FIELD_PASSWORD, playerPassword, MAX_PASSWORD);
 
             // show the login dialog and pass the password and salt for
-            printf("OnPlayerConnect: salt: %s | password: %s", playerSalt, playerPassword);
             PromptLogin(playerid, playerSalt, playerPassword);
 
         } else {

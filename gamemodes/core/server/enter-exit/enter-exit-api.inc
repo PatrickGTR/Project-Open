@@ -47,7 +47,7 @@ CreateMapIconOnEntrance(id, iconid) {
     return 1;
 }
 
-/* 
+/*
     Function:
         SetEntranceName(id, const ent_name[])
     Information:
@@ -85,16 +85,16 @@ GetEntranceName(playerid)
 */
 CreateEntrance(Float:enx, Float:eny, Float:enz, Float:enang, Float:exx, Float:exy, Float:exz, Float:exang, vwid, intid) {
 
-    new 
+    new
         entid = Iter_Alloc(entranceID),
         arr[2]
     ;
 
     arr[0] = ENEX_STREAMER_IDENTIFIER;
     arr[1] = entid;
-    
+
     entranceCheckpoint[entid] = CreateDynamicCP(enx, eny, enz + 0.50, 1.5, .streamdistance = CHECKPOINT_STREAMDISTANCE);
-    exitCheckpoint[entid] = CreateDynamicCP(exx, exy, exz + 0.50, 1.5, vwid, intid, .streamdistance = CHECKPOINT_STREAMDISTANCE);
+    exitCheckpoint[entid]     = CreateDynamicCP(exx, exy, exz + 0.50, 1.5, vwid, intid, .streamdistance = CHECKPOINT_STREAMDISTANCE);
 
     CreateDynamic3DTextLabel("[ENT]", COLOR_YELLOW, enx, eny, enz, 50.0, .testlos = 1, .streamdistance = TEXTLABEL_STREAMDISTANCE);
     CreateDynamic3DTextLabel("[EXT]", COLOR_YELLOW, exx, exy, exz, 50.0, .testlos = 1, .streamdistance = TEXTLABEL_STREAMDISTANCE);
@@ -117,7 +117,7 @@ CreateEntrance(Float:enx, Float:eny, Float:enz, Float:enang, Float:exx, Float:ex
 }
 
 /*
-    Function: 
+    Function:
         GetPlayerEntranceCD(playerid)
     Information:
         Returns unix timestamp of player last entered CP
@@ -127,7 +127,7 @@ GetPlayerEntranceCD(playerid) {
 }
 
 /*
-    Function: 
+    Function:
         SetPlayerEntranceCD(playerid)
     Information:
         Assign unix timestamp of player last entered CP
@@ -182,7 +182,7 @@ hook OnPlayerEnterDynamicCP(playerid, checkpointid)
 
             getShopName[playerid][0] = EOS;
 
-            
+
         }
     }
     return 1;
@@ -192,4 +192,6 @@ timer UnFreezeLoadingPlayer[1500](playerid) {
     TogglePlayerControllable(playerid, 1);
     return 1;
 }
+
+
 

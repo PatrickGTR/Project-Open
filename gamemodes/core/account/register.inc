@@ -16,10 +16,10 @@ PromptRegister(playerid) {
     Dialog_ShowCallback(playerid,
         using inline prompt_reg_Response,
         DIALOG_STYLE_PASSWORD, // style
-        "Please register...", // title
-        string, // content
-        "Register", // button left
-        "Leave"); // button right
+        "Please register...",  // title
+        string,                // content
+        "Register",            // button left
+        "Leave");              // button right
     return 1;
 }
 
@@ -54,7 +54,7 @@ CreateAccount(playerid, const password[])
 
     new
         salt[MAX_HASH],
-        _playerPassword[MAX_PASSWORD];
+        playerPassword[MAX_PASSWORD];
 
     for(new i; i < 10; i++) {
         salt[i] = random(79) + 47;
@@ -62,7 +62,7 @@ CreateAccount(playerid, const password[])
     salt[10] = 0;
 
 
-    SHA256_PassHash(password, salt, _playerPassword, MAX_PASSWORD);
+    SHA256_PassHash(password, salt, playerPassword, MAX_PASSWORD);
 
     inline OnPlayerRegister() {
         SetPlayerAccountID(playerid, cache_insert_id());
@@ -73,6 +73,6 @@ CreateAccount(playerid, const password[])
     new
         playerName[MAX_PLAYER_NAME];
     GetPlayerName(playerid, playerName, sizeof(playerName));
-    MySQL_TQueryInline(GetMySQLHandle(), using inline OnPlayerRegister, "INSERT INTO accounts ("FIELD_USERNAME", "FIELD_PASSWORD", "FIELD_SALT", "FIELD_REG_DATE") VALUES ('%e', '%e', '%e', CURRENT_TIMESTAMP())", playerName, _playerPassword, salt);
+    MySQL_TQueryInline(GetMySQLHandle(), using inline OnPlayerRegister, "INSERT INTO accounts ("FIELD_USERNAME", "FIELD_PASSWORD", "FIELD_SALT", "FIELD_REG_DATE") VALUES ('%e', '%e', '%e', CURRENT_TIMESTAMP())", playerName, playerPassword, salt);
     return 1;
 }

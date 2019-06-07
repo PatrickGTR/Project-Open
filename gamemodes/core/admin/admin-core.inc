@@ -66,7 +66,7 @@ SendAdminMessage(const fmat[])
 {
     foreach(new i : Player)
     {
-        if (i != INVALID_PLAYER_ID && GetPlayerAdminLevel(i) > 0)
+        if (GetPlayerAdminLevel(i) > 0)
         {
             SendMsgF(i, COLOR_LIGHTGREEN, "** ADMIN ** "C_WHITE"- %s", fmat);
         }
@@ -81,7 +81,7 @@ SendAdminMessageF(const fmat[], {Float,_}:...)
 
     foreach(new i : Player)
     {
-        if (i != INVALID_PLAYER_ID && GetPlayerAdminLevel(i) > 0)
+        if (GetPlayerAdminLevel(i) > 0)
         {
             formatex(out, sizeof(out), fmat, ___(1));
             SendAdminMessage(out);
